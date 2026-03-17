@@ -5,12 +5,14 @@ import Navigation from '../components/Navigation';
 import { Button } from '@/components/ui/button';
 import { Stethoscope } from 'lucide-react';
 import { toast } from 'sonner';
+import StarRating from '../components/StarRating';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
 export default function DoctorsPage() {
   const [doctors, setDoctors] = useState([]);
+  const [ratings, setRatings] = useState({});
   const [loading, setLoading] = useState(true);
   const [selectedSpecialization, setSelectedSpecialization] = useState('all');
 
@@ -22,6 +24,20 @@ export default function DoctorsPage() {
     try {
       const response = await axios.get(`${API}/doctors`);
       setDoctors(response.data);
+      
+      // Fetch ratings for all doctors
+      const ratingsData = {};
+      await Promise.all(
+        response.data.map(async (doctor) => {
+          try {
+            const ratingRes = await axios.get(`${API}/doctors/${doctor.id}/rating`);
+            ratingsData[doctor.id] = ratingRes.data;
+          } catch (err) {
+            ratingsData[doctor.id] = { average_rating: 0, total_reviews: 0 };
+          }
+        })
+      );
+      setRatings(ratingsData);
     } catch (error) {
       toast.error('Failed to load doctors');
       console.error(error);
@@ -76,22 +92,24 @@ export default function DoctorsPage() {
               {filteredDoctors.map((doctor) => (
                 <Link key={doctor.id} to={`/doctors/${doctor.id}`}>
                   <div 
-                    className="group relative overflow-hidden rounded-3xl bg-white shadow-md hover:shadow-2xl transition-all cursor-pointer"
+                    className="group relative overflow-hidden rounded-3xl bg-white shadow-md hover:shadow-2xl transition-all cursor-pointer border border-border/40"
                     data-testid={`doctor-card-${doctor.id}`}
                   >
-                    <div className="aspect-square overflow-hidden bg-primary/5">
-                      <img 
-                        src={doctor.image_url} 
-                        alt={doctor.name}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                      />
-                    </div>
-                    <div className="p-6">
-                      <div className="flex items-start gap-3 mb-3">
-                        <Stethoscope className="h-5 w-5 text-primary flex-shrink-0 mt-1" />
+                    <div className="p-8">
+                      <div className="flex items-start gap-3 mb-4">
+                        <div className="bg-primary/10 p-3 rounded-full">
+                          <Stethoscope className="h-6 w-6 text-primary" />
+                        </div>
                         <div className="flex-1">
                           <h3 className="text-xl font-semibold mb-1" data-testid={`doctor-name-${doctor.id}`}>{doctor.name}</h3>
-                          <p className="text-sm text-primary font-medium" data-testid={`doctor-spec-${doctor.id}`}>{doctor.specialization}</p>
+                          <p className="text-sm text-primary font-medium mb-2" data-testid={`doctor-spec-${doctor.id}`}>{doctor.specialization}</p>
+                          {ratings[doctor.id] && ratings[doctor.id].total_reviews > 0 && (
+                            <StarRating 
+                              rating={ratings[doctor.id].average_rating} 
+                              totalReviews={ratings[doctor.id].total_reviews}
+                              size="sm"
+                            />
+                          )}
                         </div>
                       </div>
                       <p className="text-sm text-muted-foreground mb-4" data-testid={`doctor-qual-${doctor.id}`}>{doctor.qualifications}</p>

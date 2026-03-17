@@ -17,116 +17,97 @@ doctors_data = [
     {
         "name": "Dr. Mithun Das",
         "specialization": "Medicine / Physician",
-        "qualifications": "MBBS, MD (Medicine), MACP",
-        "image_url": "https://images.unsplash.com/photo-1678940805950-73f2127f9d4e?w=400"
+        "qualifications": "MBBS, MD (Medicine), MACP"
     },
     {
         "name": "Dr. Aman Ghosh",
         "specialization": "Orthopaedic Surgery",
-        "qualifications": "MBBS, D-Ortho",
-        "image_url": "https://images.unsplash.com/photo-1678940805950-73f2127f9d4e?w=400"
+        "qualifications": "MBBS, D-Ortho"
     },
     {
         "name": "Dr. Bikash Nandi",
         "specialization": "Dental",
-        "qualifications": "BDS",
-        "image_url": "https://images.unsplash.com/photo-1678940805950-73f2127f9d4e?w=400"
+        "qualifications": "BDS"
     },
     {
         "name": "Dr. Subhajit Chakraborty",
         "specialization": "Dental",
-        "qualifications": "BDS, MDS (Periodontist & Implantologist)",
-        "image_url": "https://images.unsplash.com/photo-1678940805950-73f2127f9d4e?w=400"
+        "qualifications": "BDS, MDS (Periodontist & Implantologist)"
     },
     {
         "name": "Dr. Debasish Mallick",
         "specialization": "ENT",
-        "qualifications": "MBBS, MS (ENT & Head Neck Surgery)",
-        "image_url": "https://images.unsplash.com/photo-1678940805950-73f2127f9d4e?w=400"
+        "qualifications": "MBBS, MS (ENT & Head Neck Surgery)"
     },
     {
         "name": "Dr. Dipankar Das",
         "specialization": "ENT",
-        "qualifications": "MBBS, MS (ENT & Head Neck Surgery)",
-        "image_url": "https://images.unsplash.com/photo-1678940805950-73f2127f9d4e?w=400"
+        "qualifications": "MBBS, MS (ENT & Head Neck Surgery)"
     },
     {
         "name": "Dr. Dulal Chandra Barman",
         "specialization": "Dermatology",
-        "qualifications": "MBBS, MD (Dermatology)",
-        "image_url": "https://images.unsplash.com/photo-1678940805950-73f2127f9d4e?w=400"
+        "qualifications": "MBBS, MD (Dermatology)"
     },
     {
         "name": "Dr. Soumen Chakraborty",
         "specialization": "General Surgery",
-        "qualifications": "MBBS, MS (Gen Surgery) - Laparoscopic Surgeon",
-        "image_url": "https://images.unsplash.com/photo-1678940805950-73f2127f9d4e?w=400"
+        "qualifications": "MBBS, MS (Gen Surgery) - Laparoscopic Surgeon"
     },
     {
         "name": "Dr. Santanu Bhattacharya",
         "specialization": "Psychiatry",
-        "qualifications": "MBBS, MD, DPM (Neuro-Psychiatrist)",
-        "image_url": "https://images.unsplash.com/photo-1678940805950-73f2127f9d4e?w=400"
+        "qualifications": "MBBS, MD, DPM (Neuro-Psychiatrist)"
     },
     {
         "name": "Dr. Subhashish Chatterjee",
         "specialization": "Chest Specialist",
-        "qualifications": "MBBS, DTCD, DMRD",
-        "image_url": "https://images.unsplash.com/photo-1678940805950-73f2127f9d4e?w=400"
+        "qualifications": "MBBS, DTCD, DMRD"
     },
     {
         "name": "Dr. Sadhan Kumar Mal",
         "specialization": "Urology",
-        "qualifications": "MBBS, MS, MCh (Urology)",
-        "image_url": "https://images.unsplash.com/photo-1678940805950-73f2127f9d4e?w=400"
+        "qualifications": "MBBS, MS, MCh (Urology)"
     },
     {
         "name": "Dr. Anjan Kumar Saha",
         "specialization": "Paediatrics",
-        "qualifications": "MBBS, MD (Paediatrics)",
-        "image_url": "https://images.unsplash.com/photo-1678940805950-73f2127f9d4e?w=400"
+        "qualifications": "MBBS, MD (Paediatrics)"
     },
     {
         "name": "Dr. Jinia Saha Roychowdhury",
         "specialization": "Paediatrics",
-        "qualifications": "MBBS, MD (Paediatrics), MRCPCH (UK) - Neonatologist",
-        "image_url": "https://images.unsplash.com/photo-1659353888906-adb3e0041693?w=400"
+        "qualifications": "MBBS, MD (Paediatrics), MRCPCH (UK) - Neonatologist"
     },
     {
         "name": "Dr. Kajal Pandit",
         "specialization": "Gynaecology / Obstetrics",
-        "qualifications": "MBBS, DGO - Consultant Obstetrician & Gynaecologist",
-        "image_url": "https://images.unsplash.com/photo-1659353888906-adb3e0041693?w=400"
+        "qualifications": "MBBS, DGO - Consultant Obstetrician & Gynaecologist"
     },
     {
         "name": "Dr. Manas Sarkar",
         "specialization": "Gynaecology / Obstetrics",
-        "qualifications": "MBBS, DGO - Consultant Obstetrician & Gynaecologist",
-        "image_url": "https://images.unsplash.com/photo-1678940805950-73f2127f9d4e?w=400"
+        "qualifications": "MBBS, DGO - Consultant Obstetrician & Gynaecologist"
     },
     {
         "name": "Dr. Deba Patni",
         "specialization": "Gynaecology / Obstetrics",
-        "qualifications": "MBBS, DGO - Consultant Obstetrician & Gynaecologist",
-        "image_url": "https://images.unsplash.com/photo-1659353888906-adb3e0041693?w=400"
+        "qualifications": "MBBS, DGO - Consultant Obstetrician & Gynaecologist"
     },
     {
         "name": "Dr. Sourav Halder",
         "specialization": "Gynaecology / Obstetrics",
-        "qualifications": "MBBS, DGO - Consultant Obstetrician & Gynaecologist",
-        "image_url": "https://images.unsplash.com/photo-1678940805950-73f2127f9d4e?w=400"
+        "qualifications": "MBBS, DGO - Consultant Obstetrician & Gynaecologist"
     },
     {
         "name": "Dr. Shatarshi De Das",
         "specialization": "Infertility Specialist",
-        "qualifications": "Fellowship in Infertility",
-        "image_url": "https://images.unsplash.com/photo-1678940805950-73f2127f9d4e?w=400"
+        "qualifications": "Fellowship in Infertility"
     },
     {
         "name": "Dr. Prasenjit Saha",
         "specialization": "Pathology",
-        "qualifications": "MD Pathology",
-        "image_url": "https://images.unsplash.com/photo-1678940805950-73f2127f9d4e?w=400"
+        "qualifications": "MD Pathology"
     }
 ]
 
@@ -144,7 +125,6 @@ async def seed_doctors():
             "name": doctor_data["name"],
             "specialization": doctor_data["specialization"],
             "qualifications": doctor_data["qualifications"],
-            "image_url": doctor_data["image_url"],
             "available_days": available_days,
             "created_at": datetime.now(timezone.utc).isoformat()
         }

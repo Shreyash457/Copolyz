@@ -3,9 +3,17 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Navigation from '../components/Navigation';
 import { Button } from '@/components/ui/button';
-import { Calendar, Clock, User, FileText } from 'lucide-react';
+import { Textarea } from '@/components/ui/textarea';
+import { Calendar, Clock, Star } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuth } from '../contexts/AuthContext';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
@@ -22,6 +30,9 @@ export default function PatientDashboard() {
   const { user, token, loading: authLoading } = useAuth();
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedAppointment, setSelectedAppointment] = useState(null);
+  const [isReviewDialogOpen, setIsReviewDialogOpen] = useState(false);
+  const [reviewData, setReviewData] = useState({ rating: 5, comment: '' });
 
   useEffect(() => {
     if (!authLoading) {
@@ -46,6 +57,33 @@ export default function PatientDashboard() {
       console.error(error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const openReviewDialog = (appointment) => {
+    setSelectedAppointment(appointment);
+    setReviewData({ rating: 5, comment: '' });
+    setIsReviewDialogOpen(true);
+  };
+
+  const submitReview = async () => {
+    try {
+      await axios.post(
+        `${API}/reviews`,
+        {
+          doctor_id: selectedAppointment.doctor_id,
+          appointment_id: selectedAppointment.id,
+          rating: reviewData.rating,
+          comment: reviewData.comment
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      toast.success('Review submitted successfully!');
+      setIsReviewDialogOpen(false);
+      fetchAppointments();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Failed to submit review');
+      console.error(error);
     }
   };
 
@@ -152,6 +190,17 @@ export default function PatientDashboard() {
                             <p className="text-sm" data-testid={`notes-${appointment.id}`}>{appointment.admin_notes}</p>
                           </div>
                         )}
+                        {appointment.status === 'completed' && (
+                          <Button 
+                            onClick={() => openReviewDialog(appointment)}
+                            variant="outline"
+                            className="rounded-full"
+                            data-testid={`review-btn-${appointment.id}`}
+                          >
+                            <Star className="h-4 w-4 mr-2" />
+                            Write Review
+                          </Button>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -161,6 +210,60 @@ export default function PatientDashboard() {
           </div>
         </div>
       </div>
+
+      {/* Review Dialog */}
+      <Dialog open={isReviewDialogOpen} onOpenChange={setIsReviewDialogOpen}>
+        <DialogContent className="sm:max-w-md" data-testid="review-dialog">
+          <DialogHeader>
+            <DialogTitle>Write a Review</DialogTitle>
+            <DialogDescription>
+              Share your experience with {selectedAppointment?.doctor_name}
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            <div>
+              <label className="text-sm font-medium mb-2 block">Rating</label>
+              <div className="flex gap-2">
+                {[1, 2, 3, 4, 5].map((value) => (
+                  <button
+                    key={value}
+                    type="button"
+                    onClick={() => setReviewData({...reviewData, rating: value})}
+                    className="focus:outline-none"
+                    data-testid={`rating-star-${value}`}
+                  >
+                    <Star 
+                      className={`h-8 w-8 ${value <= reviewData.rating ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'}`}
+                    />
+                  </button>
+                ))}
+              </div>
+            </div>
+            
+            <div>
+              <label className="text-sm font-medium mb-2 block">Your Review</label>
+              <Textarea
+                value={reviewData.comment}
+                onChange={(e) => setReviewData({...reviewData, comment: e.target.value})}
+                rows={4}
+                className="rounded-xl"
+                placeholder="Share your experience..."
+                data-testid="review-comment-input"
+              />
+            </div>
+            
+            <Button 
+              onClick={submitReview} 
+              className="w-full rounded-full"
+              disabled={!reviewData.comment.trim()}
+              data-testid="submit-review-btn"
+            >
+              Submit Review
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

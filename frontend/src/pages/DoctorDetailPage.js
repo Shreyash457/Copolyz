@@ -6,9 +6,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Calendar, Stethoscope, Award, ArrowLeft } from 'lucide-react';
+import { Calendar, Stethoscope, Award, ArrowLeft, Star, User } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuth } from '../contexts/AuthContext';
+import StarRating from '../components/StarRating';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
@@ -18,6 +19,8 @@ export default function DoctorDetailPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [doctor, setDoctor] = useState(null);
+  const [reviews, setReviews] = useState([]);
+  const [rating, setRating] = useState({ average_rating: 0, total_reviews: 0 });
   const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState({
     patient_name: user?.name || '',
@@ -29,6 +32,8 @@ export default function DoctorDetailPage() {
 
   useEffect(() => {
     fetchDoctor();
+    fetchReviews();
+    fetchRating();
   }, [id]);
 
   useEffect(() => {
@@ -51,6 +56,24 @@ export default function DoctorDetailPage() {
       console.error(error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchReviews = async () => {
+    try {
+      const response = await axios.get(`${API}/doctors/${id}/reviews`);
+      setReviews(response.data);
+    } catch (error) {
+      console.error('Failed to load reviews:', error);
+    }
+  };
+
+  const fetchRating = async () => {
+    try {
+      const response = await axios.get(`${API}/doctors/${id}/rating`);
+      setRating(response.data);
+    } catch (error) {
+      console.error('Failed to load rating:', error);
     }
   };
 
@@ -119,24 +142,28 @@ export default function DoctorDetailPage() {
           <div className="grid lg:grid-cols-2 gap-12">
             {/* Doctor Info */}
             <div>
-              <div className="rounded-3xl overflow-hidden bg-primary/5 mb-6">
-                <img 
-                  src={doctor.image_url} 
-                  alt={doctor.name}
-                  className="w-full aspect-square object-cover"
-                  data-testid="doctor-detail-image"
-                />
-              </div>
-              
-              <div className="bg-white rounded-2xl p-8 border border-border/40">
-                <div className="flex items-start gap-3 mb-4">
-                  <Stethoscope className="h-6 w-6 text-primary flex-shrink-0 mt-1" />
-                  <div>
-                    <h1 className="text-3xl font-semibold mb-2" data-testid="doctor-detail-name">{doctor.name}</h1>
-                    <p className="text-lg text-primary font-medium" data-testid="doctor-detail-spec">{doctor.specialization}</p>
-                  </div>
+              <div className="bg-white rounded-3xl p-10 border border-border/40 mb-6">
+                <div className="flex items-center justify-center bg-primary/10 w-24 h-24 rounded-full mb-6 mx-auto">
+                  <Stethoscope className="h-12 w-12 text-primary" />
                 </div>
                 
+                <div className="text-center">
+                  <h1 className="text-3xl font-semibold mb-2" data-testid="doctor-detail-name">{doctor.name}</h1>
+                  <p className="text-lg text-primary font-medium mb-4" data-testid="doctor-detail-spec">{doctor.specialization}</p>
+                  
+                  {rating.total_reviews > 0 && (
+                    <div className="flex justify-center mb-4">
+                      <StarRating 
+                        rating={rating.average_rating} 
+                        totalReviews={rating.total_reviews}
+                        size="md"
+                      />
+                    </div>
+                  )}
+                </div>
+              </div>
+              
+              <div className="bg-white rounded-2xl p-8 border border-border/40 mb-6">
                 <div className="flex items-start gap-3 mb-6">
                   <Award className="h-5 w-5 text-primary flex-shrink-0 mt-1" />
                   <div>
@@ -156,6 +183,41 @@ export default function DoctorDetailPage() {
                   </div>
                 </div>
               </div>
+
+              {/* Reviews Section */}
+              {reviews.length > 0 && (
+                <div className="bg-white rounded-2xl p-8 border border-border/40">
+                  <h3 className="text-xl font-semibold mb-6">Patient Reviews</h3>
+                  <div className="space-y-4 max-h-96 overflow-y-auto">
+                    {reviews.map((review) => (
+                      <div key={review.id} className="border-b border-border/40 pb-4 last:border-0" data-testid={`review-${review.id}`}>
+                        <div className="flex items-start justify-between mb-2">
+                          <div className="flex items-center gap-2">
+                            <div className="bg-primary/10 p-2 rounded-full">
+                              <User className="h-4 w-4 text-primary" />
+                            </div>
+                            <div>
+                              <p className="font-medium text-sm">{review.patient_name}</p>
+                              <div className="flex items-center gap-1 mt-1">
+                                {[...Array(5)].map((_, i) => (
+                                  <Star 
+                                    key={i} 
+                                    className={`h-3 w-3 ${i < review.rating ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'}`}
+                                  />
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                          <span className="text-xs text-muted-foreground">
+                            {new Date(review.created_at).toLocaleDateString()}
+                          </span>
+                        </div>
+                        <p className="text-sm text-muted-foreground ml-10">{review.comment}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Appointment Form */}

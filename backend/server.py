@@ -100,6 +100,24 @@ class AppointmentUpdate(BaseModel):
     status: AppointmentStatus
     admin_notes: Optional[str] = None
 
+class Review(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    patient_id: str
+    patient_name: str
+    doctor_id: str
+    appointment_id: str
+    rating: int = Field(ge=1, le=5)
+    comment: str
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class ReviewCreate(BaseModel):
+    doctor_id: str
+    appointment_id: str
+    rating: int = Field(ge=1, le=5)
+    comment: str
+
+
 def hash_password(password: str) -> str:
     return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
 
@@ -256,6 +274,64 @@ async def update_appointment(
         updated['updated_at'] = datetime.fromisoformat(updated['updated_at'])
     
     return Appointment(**updated)
+
+
+@api_router.post("/reviews", response_model=Review)
+async def create_review(review_data: ReviewCreate, current_user: dict = Depends(get_current_user)):
+    # Check if appointment exists and is completed
+    appointment = await db.appointments.find_one({"id": review_data.appointment_id}, {"_id": 0})
+    if not appointment:
+        raise HTTPException(status_code=404, detail="Appointment not found")
+    
+    if appointment['status'] != 'completed':
+        raise HTTPException(status_code=400, detail="Can only review completed appointments")
+    
+    if appointment['patient_id'] != current_user['user_id']:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    # Check if review already exists for this appointment
+    existing_review = await db.reviews.find_one({"appointment_id": review_data.appointment_id}, {"_id": 0})
+    if existing_review:
+        raise HTTPException(status_code=400, detail="Review already submitted for this appointment")
+    
+    user_doc = await db.users.find_one({"id": current_user['user_id']}, {"_id": 0})
+    
+    review = Review(
+        patient_id=current_user['user_id'],
+        patient_name=user_doc['name'],
+        doctor_id=review_data.doctor_id,
+        appointment_id=review_data.appointment_id,
+        rating=review_data.rating,
+        comment=review_data.comment
+    )
+    
+    doc = review.model_dump()
+    doc['created_at'] = doc['created_at'].isoformat()
+    
+    await db.reviews.insert_one(doc)
+    return review
+
+@api_router.get("/doctors/{doctor_id}/reviews", response_model=List[Review])
+async def get_doctor_reviews(doctor_id: str):
+    reviews = await db.reviews.find({"doctor_id": doctor_id}, {"_id": 0}).sort("created_at", -1).to_list(1000)
+    
+    for review in reviews:
+        if isinstance(review.get('created_at'), str):
+            review['created_at'] = datetime.fromisoformat(review['created_at'])
+    
+    return reviews
+
+@api_router.get("/doctors/{doctor_id}/rating")
+async def get_doctor_rating(doctor_id: str):
+    reviews = await db.reviews.find({"doctor_id": doctor_id}, {"_id": 0, "rating": 1}).to_list(1000)
+    
+    if not reviews:
+        return {"average_rating": 0, "total_reviews": 0}
+    
+    total_rating = sum(r['rating'] for r in reviews)
+    average_rating = round(total_rating / len(reviews), 1)
+    
+    return {"average_rating": average_rating, "total_reviews": len(reviews)}
 
 @api_router.get("/")
 async def root():
