@@ -1,0 +1,24 @@
+{
+  "short_name": "Coochbehar Polyclinic",
+  "name": "Coochbehar Polyclinic - Appointment Booking",
+  "description": "Book appointments with 20+ specialist doctors at Coochbehar Polyclinic",
+  "icons": [
+    {
+      "src": "/logo192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/logo512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#2D5A27",
+  "background_color": "#F7F5F0",
+  "orientation": "portrait"
+}
