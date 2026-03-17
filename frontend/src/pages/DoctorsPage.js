@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import Navigation from '../components/Navigation';
@@ -15,6 +15,7 @@ export default function DoctorsPage() {
   const [ratings, setRatings] = useState({});
   const [loading, setLoading] = useState(true);
   const [selectedSpecialization, setSelectedSpecialization] = useState('all');
+  const doctorsGridRef = useRef(null);
 
   useEffect(() => {
     fetchDoctors();
@@ -46,6 +47,19 @@ export default function DoctorsPage() {
     }
   };
 
+  const handleSpecializationClick = (spec) => {
+    setSelectedSpecialization(spec);
+    
+    // Smooth scroll to doctors grid with offset
+    setTimeout(() => {
+      if (doctorsGridRef.current) {
+        const yOffset = -100; // Offset from top
+        const y = doctorsGridRef.current.getBoundingClientRect().top + window.pageYOffset + yOffset;
+        window.scrollTo({ top: y, behavior: 'smooth' });
+      }
+    }, 100);
+  };
+
   const specializations = ['all', ...new Set(doctors.map(d => d.specialization))];
   const filteredDoctors = selectedSpecialization === 'all' 
     ? doctors 
@@ -65,15 +79,15 @@ export default function DoctorsPage() {
           </div>
 
           {/* Specialization Filter */}
-          <div className="flex flex-wrap gap-3 mb-12 justify-center" data-testid="specialization-filter">
+          <div className="flex flex-wrap gap-3 mb-12 justify-center sticky top-20 z-40 bg-background/95 backdrop-blur-sm py-4 rounded-2xl shadow-sm" data-testid="specialization-filter">
             {specializations.map((spec) => (
               <button
                 key={spec}
-                onClick={() => setSelectedSpecialization(spec)}
-                className={`px-6 py-2 rounded-full text-sm font-medium transition-all ${
+                onClick={() => handleSpecializationClick(spec)}
+                className={`px-6 py-2 rounded-full text-sm font-medium transition-all duration-300 transform hover:scale-105 ${
                   selectedSpecialization === spec
-                    ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20'
-                    : 'bg-white text-foreground border border-border hover:border-primary'
+                    ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20 scale-105'
+                    : 'bg-white text-foreground border border-border hover:border-primary hover:shadow-md'
                 }`}
                 data-testid={`filter-${spec}`}
               >
@@ -83,48 +97,51 @@ export default function DoctorsPage() {
           </div>
 
           {/* Doctors Grid */}
-          {loading ? (
-            <div className="text-center py-20" data-testid="loading-doctors">
-              <p className="text-muted-foreground">Loading doctors...</p>
-            </div>
-          ) : (
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {filteredDoctors.map((doctor) => (
-                <Link key={doctor.id} to={`/doctors/${doctor.id}`}>
-                  <div 
-                    className="group relative overflow-hidden rounded-3xl bg-white shadow-md hover:shadow-2xl transition-all cursor-pointer border border-border/40"
-                    data-testid={`doctor-card-${doctor.id}`}
-                  >
-                    <div className="p-8">
-                      <div className="flex items-start gap-3 mb-4">
-                        <div className="bg-primary/10 p-3 rounded-full">
-                          <Stethoscope className="h-6 w-6 text-primary" />
+          <div ref={doctorsGridRef} className="scroll-mt-32">
+            {loading ? (
+              <div className="text-center py-20" data-testid="loading-doctors">
+                <p className="text-muted-foreground">Loading doctors...</p>
+              </div>
+            ) : (
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {filteredDoctors.map((doctor, index) => (
+                  <Link key={doctor.id} to={`/doctors/${doctor.id}`}>
+                    <div 
+                      className="group relative overflow-hidden rounded-3xl bg-white shadow-md hover:shadow-2xl transition-all duration-300 cursor-pointer border border-border/40 animate-fadeIn"
+                      style={{ animationDelay: `${index * 50}ms` }}
+                      data-testid={`doctor-card-${doctor.id}`}
+                    >
+                      <div className="p-8">
+                        <div className="flex items-start gap-3 mb-4">
+                          <div className="bg-primary/10 p-3 rounded-full group-hover:scale-110 transition-transform duration-300">
+                            <Stethoscope className="h-6 w-6 text-primary" />
+                          </div>
+                          <div className="flex-1">
+                            <h3 className="text-xl font-semibold mb-1" data-testid={`doctor-name-${doctor.id}`}>{doctor.name}</h3>
+                            <p className="text-sm text-primary font-medium mb-2" data-testid={`doctor-spec-${doctor.id}`}>{doctor.specialization}</p>
+                            {ratings[doctor.id] && ratings[doctor.id].total_reviews > 0 && (
+                              <StarRating 
+                                rating={ratings[doctor.id].average_rating} 
+                                totalReviews={ratings[doctor.id].total_reviews}
+                                size="sm"
+                              />
+                            )}
+                          </div>
                         </div>
-                        <div className="flex-1">
-                          <h3 className="text-xl font-semibold mb-1" data-testid={`doctor-name-${doctor.id}`}>{doctor.name}</h3>
-                          <p className="text-sm text-primary font-medium mb-2" data-testid={`doctor-spec-${doctor.id}`}>{doctor.specialization}</p>
-                          {ratings[doctor.id] && ratings[doctor.id].total_reviews > 0 && (
-                            <StarRating 
-                              rating={ratings[doctor.id].average_rating} 
-                              totalReviews={ratings[doctor.id].total_reviews}
-                              size="sm"
-                            />
-                          )}
-                        </div>
+                        <p className="text-sm text-muted-foreground mb-4" data-testid={`doctor-qual-${doctor.id}`}>{doctor.qualifications}</p>
+                        <Button 
+                          className="w-full rounded-full group-hover:scale-105 transition-transform duration-300"
+                          data-testid={`book-btn-${doctor.id}`}
+                        >
+                          Book Appointment
+                        </Button>
                       </div>
-                      <p className="text-sm text-muted-foreground mb-4" data-testid={`doctor-qual-${doctor.id}`}>{doctor.qualifications}</p>
-                      <Button 
-                        className="w-full rounded-full"
-                        data-testid={`book-btn-${doctor.id}`}
-                      >
-                        Book Appointment
-                      </Button>
                     </div>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          )}
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
