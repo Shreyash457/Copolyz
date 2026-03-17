@@ -17,27 +17,27 @@ doctors_data = [
     {
         "name": "Dr. Mithun Das",
         "specialization": "Medicine / Physician",
-        "qualifications": "MBBS, MD (Medicine), MACP"
+        "qualifications": "MBBS (WBUHS), MD (Medicine), MACP, Coochbehar"
     },
     {
         "name": "Dr. Aman Ghosh",
         "specialization": "Orthopaedic Surgery",
-        "qualifications": "MBBS, D-Ortho"
+        "qualifications": "MBBS (Cal), D. Ortho (Cal), Orthopaedic Surgeon"
     },
     {
         "name": "Dr. Bikash Nandi",
         "specialization": "Dental",
-        "qualifications": "BDS"
+        "qualifications": "BDS (WBUHS), Consultant Dental Surgeon, Cooch Behar"
     },
     {
         "name": "Dr. Subhajit Chakraborty",
         "specialization": "Dental",
-        "qualifications": "BDS, MDS (Periodontist & Implantologist)"
+        "qualifications": "BDS (WBUHS), MDS (RMLAU), Periodontist & Implantologist"
     },
     {
         "name": "Dr. Debasish Mallick",
         "specialization": "ENT",
-        "qualifications": "MBBS, MS (ENT & Head Neck Surgery)"
+        "qualifications": "MBBS, DO, MS (ENT & Head Neck Surgery), Consultant ENT Surgeon"
     },
     {
         "name": "Dr. Dipankar Das",
@@ -47,32 +47,32 @@ doctors_data = [
     {
         "name": "Dr. Dulal Chandra Barman",
         "specialization": "Dermatology",
-        "qualifications": "MBBS, MD (Dermatology)"
+        "qualifications": "MBBS, DMRD, MD (Dermatology), Consultant Dermatologist"
     },
     {
         "name": "Dr. Soumen Chakraborty",
         "specialization": "General Surgery",
-        "qualifications": "MBBS, MS (Gen Surgery) - Laparoscopic Surgeon"
+        "qualifications": "MBBS, MS (Gen Surgery), DMAS, FMAS, Laparoscopy Surgeon"
     },
     {
         "name": "Dr. Santanu Bhattacharya",
         "specialization": "Psychiatry",
-        "qualifications": "MBBS, MD, DPM (Neuro-Psychiatrist)"
+        "qualifications": "MBBS (Cal), MD, DPM, FICM, PGCDM, Neuro Psychiatrist"
     },
     {
         "name": "Dr. Subhashish Chatterjee",
         "specialization": "Chest Specialist",
-        "qualifications": "MBBS, DTCD, DMRD"
+        "qualifications": "MBBS (Kol), DTCD (Kol), DMRD (Kol), WBHS (Kol), Physician & Chest Specialist"
     },
     {
         "name": "Dr. Sadhan Kumar Mal",
         "specialization": "Urology",
-        "qualifications": "MBBS, MS, MCh (Urology)"
+        "qualifications": "MBBS, MS Gen Surgery (JJ Hospital, Mumbai), MCh Urology (KGMC, Lucknow)"
     },
     {
         "name": "Dr. Anjan Kumar Saha",
         "specialization": "Paediatrics",
-        "qualifications": "MBBS, MD (Paediatrics)"
+        "qualifications": "MBBS, MD (Paediatrics), Coochbehar MJN Medical College & Hospital"
     },
     {
         "name": "Dr. Jinia Saha Roychowdhury",
@@ -82,32 +82,32 @@ doctors_data = [
     {
         "name": "Dr. Kajal Pandit",
         "specialization": "Gynaecology / Obstetrics",
-        "qualifications": "MBBS, DGO - Consultant Obstetrician & Gynaecologist"
+        "qualifications": "MBBS (CAL), DGO, OBS & Gynaecologist"
     },
     {
         "name": "Dr. Manas Sarkar",
         "specialization": "Gynaecology / Obstetrics",
-        "qualifications": "MBBS, DGO - Consultant Obstetrician & Gynaecologist"
+        "qualifications": "MBBS, DGO, Consultant Obstetrician & Gynaecologist, Formerly Apollo Gleneagles Hospital"
     },
     {
         "name": "Dr. Deba Patni",
         "specialization": "Gynaecology / Obstetrics",
-        "qualifications": "MBBS, DGO - Consultant Obstetrician & Gynaecologist"
+        "qualifications": "MBBS, DGO, Consultant Obstetrician & Gynaecologist"
     },
     {
         "name": "Dr. Sourav Halder",
         "specialization": "Gynaecology / Obstetrics",
-        "qualifications": "MBBS, DGO - Consultant Obstetrician & Gynaecologist"
+        "qualifications": "MBBS, DNB, DGO, Consultant Gynaecologist & Obstetrician"
     },
     {
         "name": "Dr. Shatarshi De Das",
         "specialization": "Infertility Specialist",
-        "qualifications": "Fellowship in Infertility"
+        "qualifications": "MBBS, MS, DNB, Fellowship in Infertility, NOVA IVF, Siliguri"
     },
     {
         "name": "Dr. Prasenjit Saha",
         "specialization": "Pathology",
-        "qualifications": "MD Pathology"
+        "qualifications": "MBBS, DTCD, MD (Cal), Gold Medalist, Trained at TATA Memorial Hospital (Mumbai)"
     }
 ]
 
