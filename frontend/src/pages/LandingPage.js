@@ -54,17 +54,18 @@ export default function LandingPage() {
                   Book Appointment
                 </Button>
               </Link>
-              <a href="tel:03582469726">
-                <Button 
-                  variant="outline" 
-                  size="lg" 
-                  className="rounded-full px-8 py-6 text-lg border-2 hover:bg-secondary/50"
-                  data-testid="call-now-btn"
-                >
+              <Button 
+                asChild
+                variant="outline" 
+                size="lg" 
+                className="rounded-full px-8 py-6 text-lg border-2 hover:bg-secondary/50"
+                data-testid="call-now-btn"
+              >
+                <a href="tel:03582469726">
                   <Phone className="mr-2 h-5 w-5" />
                   Call Now
-                </Button>
-              </a>
+                </a>
+              </Button>
             </div>
           </div>
           
