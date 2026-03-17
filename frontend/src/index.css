@@ -10,7 +10,7 @@
   }
   body {
     @apply bg-background text-foreground font-body;
-    background: linear-gradient(135deg, #F7F5F0 0%, #FDFCFA 50%, #F2F0E8 100%);
+    background: linear-gradient(135deg, #FAFAF8 0%, #F5F3ED 50%, #EBE8DF 100%);
     background-attachment: fixed;
   }
   h1, h2, h3, h4, h5, h6 {

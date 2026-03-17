@@ -54,7 +54,7 @@ module.exports = {
                         },
                         muted: {
                                 DEFAULT: '#F0F2F0',
-                                foreground: '#5C6B5C'
+                                foreground: '#3A4A3A'
                         },
                         accent: {
                                 DEFAULT: '#D97757',
@@ -64,8 +64,8 @@ module.exports = {
                                 DEFAULT: '#DC2626',
                                 foreground: '#FFFFFF'
                         },
-                        border: '#E2E8E2',
-                        input: '#E2E8E2',
+                        border: '#D4DDD4',
+                        input: '#D4DDD4',
                         ring: '#2D5A27',
                         chart: {
                                 '1': '#2D5A27',
