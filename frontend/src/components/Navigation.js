@@ -16,9 +16,14 @@ export const Navigation = () => {
           </Link>
           
           <div className="flex items-center gap-4">
+            <Link to="/">
+              <Button variant="ghost" className="rounded-full" data-testid="nav-home">
+                Home / হোম
+              </Button>
+            </Link>
             <Link to="/doctors">
               <Button variant="ghost" className="rounded-full" data-testid="nav-doctors">
-                Doctors
+                Doctors / ডাক্তার
               </Button>
             </Link>
             
@@ -27,7 +32,7 @@ export const Navigation = () => {
                 <Link to={user.role === 'admin' ? '/admin/dashboard' : '/patient/dashboard'}>
                   <Button variant="ghost" className="rounded-full" data-testid="nav-dashboard">
                     <User className="h-4 w-4 mr-2" />
-                    Dashboard
+                    Dashboard / ড্যাশবোর্ড
                   </Button>
                 </Link>
                 <Button 
@@ -37,19 +42,19 @@ export const Navigation = () => {
                   data-testid="nav-logout"
                 >
                   <LogOut className="h-4 w-4 mr-2" />
-                  Logout
+                  Logout / লগআউট
                 </Button>
               </>
             ) : (
               <>
                 <Link to="/login">
                   <Button variant="ghost" className="rounded-full" data-testid="nav-login">
-                    Login
+                    Login / লগইন
                   </Button>
                 </Link>
                 <Link to="/signup">
                   <Button className="rounded-full shadow-lg shadow-primary/20" data-testid="nav-signup">
-                    Sign Up
+                    Sign Up / সাইন আপ
                   </Button>
                 </Link>
               </>

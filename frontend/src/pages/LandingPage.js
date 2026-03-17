@@ -51,7 +51,7 @@ export default function LandingPage() {
                   className="rounded-full px-8 py-6 text-lg shadow-lg shadow-primary/20 hover:scale-105 transition-transform"
                   data-testid="book-appointment-btn"
                 >
-                  Book Appointment
+                  Book Appointment / অ্যাপয়েন্টমেন্ট বুক করুন
                 </Button>
               </Link>
               <Button 
@@ -63,7 +63,7 @@ export default function LandingPage() {
               >
                 <a href="tel:03582469726">
                   <Phone className="mr-2 h-5 w-5" />
-                  Call Now
+                  Call Now / কল করুন
                 </a>
               </Button>
             </div>

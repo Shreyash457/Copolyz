@@ -11,6 +11,7 @@ import { Calendar, Stethoscope, Award, ArrowLeft, Star, User, Clock } from 'luci
 import { toast } from 'sonner';
 import { useAuth } from '../contexts/AuthContext';
 import StarRating from '../components/StarRating';
+import { APPOINTMENT_TYPES_INFO, AppointmentTypeCard } from '../components/AppointmentTypes';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
@@ -243,31 +244,39 @@ export default function DoctorDetailPage() {
 
             {/* Appointment Form */}
             <div className="bg-white rounded-2xl p-8 border border-border/40">
-              <h2 className="text-2xl font-semibold mb-6" data-testid="appointment-form-title">Request Appointment</h2>
+              <h2 className="text-2xl font-semibold mb-4" data-testid="appointment-form-title">
+                Request Appointment / অ্যাপয়েন্টমেন্টের অনুরোধ
+              </h2>
+              <p className="text-sm text-muted-foreground mb-6">
+                Fill the form below to book your appointment / নিচের ফর্মটি পূরণ করুন
+              </p>
               
               {!user && (
                 <div className="bg-accent/10 border border-accent/20 rounded-xl p-4 mb-6" data-testid="guest-notice">
                   <p className="text-sm text-accent-foreground">
-                    <strong>Guest Booking:</strong> You can book as a guest, but we recommend creating an account to track your appointments.
+                    <strong>Guest Booking / অতিথি বুকিং:</strong> You can book as a guest, but we recommend creating an account to track your appointments.
+                    <br />
+                    <span className="text-xs">আপনি অতিথি হিসেবে বুক করতে পারেন, তবে আমরা আপনার অ্যাপয়েন্টমেন্ট ট্র্যাক করতে একটি অ্যাকাউন্ট তৈরি করার পরামর্শ দিই।</span>
                   </p>
                 </div>
               )}
               
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
-                  <Label htmlFor="patient_name">Full Name *</Label>
+                  <Label htmlFor="patient_name">Full Name / পুরো নাম *</Label>
                   <Input
                     id="patient_name"
                     value={formData.patient_name}
                     onChange={(e) => setFormData({...formData, patient_name: e.target.value})}
                     required
                     className="rounded-xl mt-2"
+                    placeholder="Enter your full name / আপনার পুরো নাম লিখুন"
                     data-testid="input-name"
                   />
                 </div>
                 
                 <div>
-                  <Label htmlFor="patient_email">Email *</Label>
+                  <Label htmlFor="patient_email">Email / ইমেইল *</Label>
                   <Input
                     id="patient_email"
                     type="email"
@@ -275,42 +284,58 @@ export default function DoctorDetailPage() {
                     onChange={(e) => setFormData({...formData, patient_email: e.target.value})}
                     required
                     className="rounded-xl mt-2"
+                    placeholder="example@email.com"
                     data-testid="input-email"
                   />
                 </div>
                 
                 <div>
-                  <Label htmlFor="patient_phone">Phone Number *</Label>
+                  <Label htmlFor="patient_phone">Phone Number / ফোন নম্বর *</Label>
                   <Input
                     id="patient_phone"
                     value={formData.patient_phone}
                     onChange={(e) => setFormData({...formData, patient_phone: e.target.value})}
                     required
                     className="rounded-xl mt-2"
+                    placeholder="10-digit mobile number / ১০ সংখ্যার মোবাইল নম্বর"
                     data-testid="input-phone"
                   />
                 </div>
                 
                 <div>
-                  <Label htmlFor="appointment_type">Appointment Type *</Label>
+                  <Label htmlFor="appointment_type">Appointment Type / অ্যাপয়েন্টমেন্ট ধরন *</Label>
                   <Select
                     value={formData.appointment_type}
                     onValueChange={(value) => setFormData({...formData, appointment_type: value})}
                   >
                     <SelectTrigger className="rounded-xl mt-2" data-testid="input-appointment-type">
-                      <SelectValue placeholder="Select appointment type" />
+                      <SelectValue placeholder="Select appointment type / ধরন নির্বাচন করুন" />
                     </SelectTrigger>
                     <SelectContent>
-                      {APPOINTMENT_TYPES.map((type) => (
-                        <SelectItem key={type} value={type}>{type}</SelectItem>
-                      ))}
+                      {APPOINTMENT_TYPES.map((type) => {
+                        const info = APPOINTMENT_TYPES_INFO[type];
+                        return (
+                          <SelectItem key={type} value={type}>
+                            {info ? `${info.english} / ${info.bengali}` : type}
+                          </SelectItem>
+                        );
+                      })}
                     </SelectContent>
                   </Select>
-                  <p className="text-xs text-muted-foreground mt-1">Duration: 10-15 minutes</p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Duration: 10-15 minutes / সময়কাল: ১০-১৫ মিনিট
+                  </p>
+                  
+                  {/* Show appointment type details */}
+                  {formData.appointment_type && (
+                    <div className="mt-3">
+                      <AppointmentTypeCard type={formData.appointment_type} />
+                    </div>
+                  )}
                 </div>
                 
                 <div>
-                  <Label htmlFor="preferred_date">Preferred Date *</Label>
+                  <Label htmlFor="preferred_date">Preferred Date / পছন্দের তারিখ *</Label>
                   <Input
                     id="preferred_date"
                     type="date"
@@ -324,13 +349,13 @@ export default function DoctorDetailPage() {
                 </div>
                 
                 <div>
-                  <Label htmlFor="preferred_time">Preferred Time *</Label>
+                  <Label htmlFor="preferred_time">Preferred Time / পছন্দের সময় *</Label>
                   <Select
                     value={formData.preferred_time}
                     onValueChange={(value) => setFormData({...formData, preferred_time: value})}
                   >
                     <SelectTrigger className="rounded-xl mt-2" data-testid="input-time">
-                      <SelectValue placeholder="Select time slot" />
+                      <SelectValue placeholder="Select time slot / সময় নির্বাচন করুন" />
                     </SelectTrigger>
                     <SelectContent className="max-h-60">
                       {TIME_SLOTS.map((time) => (
@@ -340,19 +365,19 @@ export default function DoctorDetailPage() {
                   </Select>
                   <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
                     <Clock className="h-3 w-3" />
-                    Clinic hours: 10:00 AM - 8:00 PM (Mon-Sat)
+                    Clinic hours: 10:00 AM - 8:00 PM (Mon-Sat) / ক্লিনিক সময়: সকাল ১০টা - রাত ৮টা (সোম-শনি)
                   </p>
                 </div>
                 
                 <div>
-                  <Label htmlFor="symptoms">Symptoms / Reason for Visit</Label>
+                  <Label htmlFor="symptoms">Symptoms / Reason for Visit / লক্ষণ বা কারণ</Label>
                   <Textarea
                     id="symptoms"
                     value={formData.symptoms}
                     onChange={(e) => setFormData({...formData, symptoms: e.target.value})}
                     rows={4}
                     className="rounded-xl mt-2"
-                    placeholder="Please describe your symptoms or reason for consultation (optional)"
+                    placeholder="Please describe your symptoms or reason for consultation (optional) / আপনার লক্ষণ বা পরামর্শের কারণ বর্ণনা করুন (ঐচ্ছিক)"
                     data-testid="input-symptoms"
                   />
                 </div>
@@ -363,11 +388,13 @@ export default function DoctorDetailPage() {
                   className="w-full rounded-full"
                   data-testid="submit-appointment-btn"
                 >
-                  Submit Appointment Request
+                  Submit Appointment Request / অ্যাপয়েন্টমেন্ট জমা দিন
                 </Button>
                 
                 <p className="text-sm text-muted-foreground text-center">
                   Your appointment will be reviewed and confirmed by our team
+                  <br />
+                  <span className="text-xs">আপনার অ্যাপয়েন্টমেন্ট আমাদের টিম দ্বারা পর্যালোচনা এবং নিশ্চিত করা হবে</span>
                 </p>
               </form>
             </div>
