@@ -285,15 +285,14 @@ export default function DoctorDetailPage() {
                 </div>
                 
                 <div>
-                  <Label htmlFor="symptoms">Symptoms / Reason for Visit *</Label>
+                  <Label htmlFor="symptoms">Symptoms / Reason for Visit</Label>
                   <Textarea
                     id="symptoms"
                     value={formData.symptoms}
                     onChange={(e) => setFormData({...formData, symptoms: e.target.value})}
-                    required
                     rows={4}
                     className="rounded-xl mt-2"
-                    placeholder="Please describe your symptoms or reason for consultation"
+                    placeholder="Please describe your symptoms or reason for consultation (optional)"
                     data-testid="input-symptoms"
                   />
                 </div>

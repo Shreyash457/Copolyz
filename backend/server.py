@@ -93,7 +93,7 @@ class AppointmentCreate(BaseModel):
     patient_phone: str
     doctor_id: str
     preferred_date: str
-    symptoms: str
+    symptoms: str = ""
     patient_id: Optional[str] = None
 
 class AppointmentUpdate(BaseModel):
