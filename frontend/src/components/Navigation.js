@@ -9,57 +9,52 @@ export const Navigation = () => {
 
   return (
     <nav className="glass-nav sticky top-0 z-50 border-b border-border">
-      <div className="w-full px-4 md:px-6 lg:px-12 py-3">
-        <div className="flex items-center justify-between gap-2 max-w-full">
-          <Link to="/" className="text-lg md:text-xl lg:text-2xl font-light tracking-tight flex-shrink-0" data-testid="nav-logo">
+      <div className="w-full px-3 py-2.5">
+        <div className="flex items-center justify-between gap-2">
+          <Link to="/" className="text-base md:text-lg lg:text-xl font-light tracking-tight flex-shrink-0 mr-2" data-testid="nav-logo">
             <span className="font-semibold text-primary">Coochbehar</span> Polyclinic
           </Link>
           
-          <div className="flex items-center gap-1 md:gap-2 lg:gap-4 flex-shrink-0">
+          <div className="flex items-center gap-1 md:gap-2 flex-shrink-0">
             <Link to="/">
-              <Button variant="ghost" size="sm" className="rounded-full px-2 md:px-3 lg:px-4 text-xs md:text-sm" data-testid="nav-home">
-                <span className="hidden sm:inline">Home / হোম</span>
-                <span className="sm:hidden">Home</span>
+              <Button variant="ghost" size="sm" className="rounded-full px-2 py-1 h-8 text-xs" data-testid="nav-home">
+                <span className="hidden md:inline">Home</span>
+                <span className="md:hidden">Home</span>
               </Button>
             </Link>
             <Link to="/doctors">
-              <Button variant="ghost" size="sm" className="rounded-full px-2 md:px-3 lg:px-4 text-xs md:text-sm" data-testid="nav-doctors">
-                <span className="hidden sm:inline">Doctors / ডাক্তার</span>
-                <span className="sm:hidden">Doctors</span>
+              <Button variant="ghost" size="sm" className="rounded-full px-2 py-1 h-8 text-xs" data-testid="nav-doctors">
+                Doctors
               </Button>
             </Link>
             
             {user ? (
               <>
                 <Link to={user.role === 'admin' ? '/admin/dashboard' : '/patient/dashboard'}>
-                  <Button variant="ghost" size="sm" className="rounded-full px-2 md:px-3 lg:px-4 text-xs md:text-sm" data-testid="nav-dashboard">
-                    <User className="h-3 w-3 md:h-4 md:w-4" />
-                    <span className="hidden md:inline ml-2">Dashboard</span>
+                  <Button variant="ghost" size="sm" className="rounded-full px-2 py-1 h-8 text-xs" data-testid="nav-dashboard">
+                    <User className="h-3 w-3" />
                   </Button>
                 </Link>
                 <Button 
                   variant="outline" 
                   size="sm"
-                  className="rounded-full px-2 md:px-3 lg:px-4 text-xs md:text-sm" 
+                  className="rounded-full px-2 py-1 h-8 text-xs" 
                   onClick={logout}
                   data-testid="nav-logout"
                 >
-                  <LogOut className="h-3 w-3 md:h-4 md:w-4" />
-                  <span className="hidden md:inline ml-2">Logout</span>
+                  <LogOut className="h-3 w-3" />
                 </Button>
               </>
             ) : (
               <>
                 <Link to="/login">
-                  <Button variant="ghost" size="sm" className="rounded-full px-2 md:px-3 lg:px-4 text-xs md:text-sm" data-testid="nav-login">
-                    <span className="hidden sm:inline">Login / লগইন</span>
-                    <span className="sm:hidden">Login</span>
+                  <Button variant="ghost" size="sm" className="rounded-full px-2 py-1 h-8 text-xs" data-testid="nav-login">
+                    Login
                   </Button>
                 </Link>
                 <Link to="/signup">
-                  <Button size="sm" className="rounded-full shadow-lg shadow-primary/20 px-2 md:px-4 lg:px-6 text-xs md:text-sm whitespace-nowrap" data-testid="nav-signup">
-                    <span className="hidden sm:inline">Sign Up / সাইন আপ</span>
-                    <span className="sm:hidden">Sign Up</span>
+                  <Button size="sm" className="rounded-full shadow-md shadow-primary/20 px-3 py-1 h-8 text-xs font-medium whitespace-nowrap" data-testid="nav-signup">
+                    Sign Up
                   </Button>
                 </Link>
               </>
