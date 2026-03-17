@@ -23,53 +23,81 @@ export default function LandingPage() {
       <Navigation />
       
       {/* Hero Section */}
-      <section className="relative min-h-[90vh] flex items-center px-6 md:px-12 lg:px-24 py-20">
-        <div className="absolute inset-0 z-0">
-          <img 
-            src="https://images.unsplash.com/photo-1762625570087-6d98fca29531?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA0MTJ8MHwxfHNlYXJjaHwyfHxtb2Rlcm4lMjBjbGluaWMlMjB3YWl0aW5nJTIwcm9vbSUyMHdhcm0lMjBsaWdodGluZyUyMGNvbWZvcnRhYmxlfGVufDB8fHx8MTc3MzczNTI2M3ww&ixlib=rb-4.1.0&q=85&w=1920"
-            alt="Clinic waiting room"
-            className="w-full h-full object-cover opacity-40"
-          />
-          <div className="absolute inset-0 hero-overlay" />
-        </div>
-        
-        <div className="relative z-10 max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 items-center">
-          <div>
-            <p className="text-sm font-medium tracking-wide uppercase text-primary mb-4" data-testid="hero-subtitle">Welcome to</p>
-            <h1 className="text-5xl md:text-6xl font-light tracking-tight leading-[1.1] mb-6" data-testid="hero-title">
-              Coochbehar <br />
-              <span className="font-semibold text-primary">Polyclinic</span>
-            </h1>
-            <p className="text-lg leading-relaxed text-muted-foreground mb-8 max-w-xl" data-testid="hero-description">
-              Experience comprehensive healthcare with our team of 20+ specialized doctors. 
-              Your health and peace of mind are our priority.
-            </p>
-            <div className="flex flex-wrap gap-4">
-              <Link to="/doctors">
+      <section className="relative overflow-hidden bg-gradient-to-br from-primary-50 to-secondary-100">
+        <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-24 py-16 md:py-24">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div className="z-10">
+              <p className="text-sm font-medium tracking-wide uppercase text-primary mb-4" data-testid="hero-subtitle">WELCOME TO</p>
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-light tracking-tight leading-[1.1] mb-6" data-testid="hero-title">
+                Coochbehar <br />
+                <span className="font-semibold text-primary">Polyclinic</span>
+              </h1>
+              <p className="text-base md:text-lg leading-relaxed text-muted-foreground mb-8 max-w-xl" data-testid="hero-description">
+                Experience comprehensive healthcare with our team of 20+ specialized doctors. 
+                Your health and peace of mind are our priority.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Link to="/doctors">
+                  <Button 
+                    size="lg" 
+                    className="rounded-full px-8 py-6 text-base md:text-lg shadow-lg shadow-primary/20 hover:scale-105 transition-transform w-full sm:w-auto"
+                    data-testid="book-appointment-btn"
+                  >
+                    Book Appointment / অ্যাপয়েন্টমেন্ট বুক করুন
+                  </Button>
+                </Link>
                 <Button 
+                  asChild
+                  variant="outline" 
                   size="lg" 
-                  className="rounded-full px-8 py-6 text-lg shadow-lg shadow-primary/20 hover:scale-105 transition-transform"
-                  data-testid="book-appointment-btn"
+                  className="rounded-full px-8 py-6 text-base md:text-lg border-2 hover:bg-secondary/50 w-full sm:w-auto"
+                  data-testid="call-now-btn"
                 >
-                  Book Appointment / অ্যাপয়েন্টমেন্ট বুক করুন
+                  <a href="tel:03582469726">
+                    <Phone className="mr-2 h-5 w-5" />
+                    Call Now / কল করুন
+                  </a>
                 </Button>
-              </Link>
-              <Button 
-                asChild
-                variant="outline" 
-                size="lg" 
-                className="rounded-full px-8 py-6 text-lg border-2 hover:bg-secondary/50"
-                data-testid="call-now-btn"
-              >
-                <a href="tel:03582469726">
-                  <Phone className="mr-2 h-5 w-5" />
-                  Call Now / কল করুন
-                </a>
-              </Button>
+              </div>
+            </div>
+            
+            <div className="hidden lg:flex justify-center items-center">
+              <div className="relative w-full aspect-square max-w-md">
+                <div className="absolute inset-0 bg-primary/10 rounded-full blur-3xl"></div>
+                <div className="relative bg-white rounded-3xl shadow-2xl p-8 border border-primary/10">
+                  <div className="space-y-6">
+                    <div className="flex items-center gap-4 p-4 bg-primary/5 rounded-2xl">
+                      <div className="bg-primary text-primary-foreground p-3 rounded-full">
+                        <Stethoscope className="h-6 w-6" />
+                      </div>
+                      <div>
+                        <p className="font-semibold">20+ Specialists</p>
+                        <p className="text-sm text-muted-foreground">Expert Doctors</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-4 p-4 bg-primary/5 rounded-2xl">
+                      <div className="bg-primary text-primary-foreground p-3 rounded-full">
+                        <Heart className="h-6 w-6" />
+                      </div>
+                      <div>
+                        <p className="font-semibold">Quality Care</p>
+                        <p className="text-sm text-muted-foreground">Patient-Centered</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-4 p-4 bg-primary/5 rounded-2xl">
+                      <div className="bg-primary text-primary-foreground p-3 rounded-full">
+                        <Award className="h-6 w-6" />
+                      </div>
+                      <div>
+                        <p className="font-semibold">Easy Booking</p>
+                        <p className="text-sm text-muted-foreground">Quick & Simple</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-          
-          <div className="hidden lg:block" />
         </div>
       </section>
 
