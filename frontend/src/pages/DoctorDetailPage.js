@@ -252,8 +252,8 @@ export default function DoctorDetailPage() {
               </p>
               
               {!user && (
-                <div className="bg-accent/10 border border-accent/20 rounded-xl p-4 mb-6" data-testid="guest-notice">
-                  <p className="text-sm text-accent-foreground">
+                <div className="bg-amber-50 border-2 border-amber-300 rounded-xl p-4 mb-6" data-testid="guest-notice">
+                  <p className="text-sm text-amber-900">
                     <strong>Guest Booking / অতিথি বুকিং:</strong> You can book as a guest, but we recommend creating an account to track your appointments.
                     <br />
                     <span className="text-xs">আপনি অতিথি হিসেবে বুক করতে পারেন, তবে আমরা আপনার অ্যাপয়েন্টমেন্ট ট্র্যাক করতে একটি অ্যাকাউন্ট তৈরি করার পরামর্শ দিই।</span>
