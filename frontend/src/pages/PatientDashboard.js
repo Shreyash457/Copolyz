@@ -22,7 +22,8 @@ const STATUS_COLORS = {
   pending: 'bg-yellow-100 text-yellow-800 border-yellow-200',
   approved: 'bg-green-100 text-green-800 border-green-200',
   rejected: 'bg-red-100 text-red-800 border-red-200',
-  completed: 'bg-blue-100 text-blue-800 border-blue-200'
+  completed: 'bg-blue-100 text-blue-800 border-blue-200',
+  cancelled: 'bg-gray-100 text-gray-800 border-gray-200'
 };
 
 export default function PatientDashboard() {
@@ -167,16 +168,18 @@ export default function PatientDashboard() {
                         <p className="text-sm text-primary font-medium mb-2" data-testid={`spec-${appointment.id}`}>
                           {appointment.doctor_specialization}
                         </p>
-                        <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
+                        <div className="flex flex-wrap gap-4 text-sm text-muted-foreground mb-2">
                           <span className="flex items-center gap-1">
                             <Calendar className="h-4 w-4" />
                             {appointment.preferred_date}
+                            {appointment.preferred_time && ` at ${appointment.preferred_time}`}
                           </span>
                           <span className="flex items-center gap-1">
                             <Clock className="h-4 w-4" />
-                            {new Date(appointment.created_at).toLocaleDateString()}
+                            {appointment.appointment_type || 'Consultation'}
                           </span>
                         </div>
+                        <p className="text-xs text-muted-foreground">Duration: 15 minutes</p>
                       </div>
                       
                       <div className="flex flex-col gap-2">

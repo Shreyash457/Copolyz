@@ -31,7 +31,8 @@ const STATUS_COLORS = {
   pending: 'bg-yellow-100 text-yellow-800 border-yellow-200',
   approved: 'bg-green-100 text-green-800 border-green-200',
   rejected: 'bg-red-100 text-red-800 border-red-200',
-  completed: 'bg-blue-100 text-blue-800 border-blue-200'
+  completed: 'bg-blue-100 text-blue-800 border-blue-200',
+  cancelled: 'bg-gray-100 text-gray-800 border-gray-200'
 };
 
 export default function AdminDashboard() {
@@ -188,11 +189,12 @@ export default function AdminDashboard() {
                         <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
                           <span className="flex items-center gap-1">
                             <Calendar className="h-4 w-4" />
-                            Preferred: {appointment.preferred_date}
+                            {appointment.preferred_date}
+                            {appointment.preferred_time && ` at ${appointment.preferred_time}`}
                           </span>
                           <span className="flex items-center gap-1">
                             <Clock className="h-4 w-4" />
-                            Requested: {new Date(appointment.created_at).toLocaleDateString()}
+                            {appointment.appointment_type || 'Consultation'} (15 mins)
                           </span>
                         </div>
                         
@@ -253,6 +255,7 @@ export default function AdminDashboard() {
                   <SelectItem value="approved">Approved</SelectItem>
                   <SelectItem value="rejected">Rejected</SelectItem>
                   <SelectItem value="completed">Completed</SelectItem>
+                  <SelectItem value="cancelled">Cancelled</SelectItem>
                 </SelectContent>
               </Select>
             </div>

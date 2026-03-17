@@ -6,13 +6,32 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Calendar, Stethoscope, Award, ArrowLeft, Star, User } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Calendar, Stethoscope, Award, ArrowLeft, Star, User, Clock } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuth } from '../contexts/AuthContext';
 import StarRating from '../components/StarRating';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
+
+const APPOINTMENT_TYPES = [
+  'New Consultation',
+  'Blood Test',
+  'ECG',
+  'X-Ray',
+  'Injection',
+  'Dressing',
+  'Medicine'
+];
+
+const TIME_SLOTS = [
+  '10:00 AM', '10:30 AM', '11:00 AM', '11:30 AM',
+  '12:00 PM', '12:30 PM', '01:00 PM', '01:30 PM',
+  '02:00 PM', '02:30 PM', '03:00 PM', '03:30 PM',
+  '04:00 PM', '04:30 PM', '05:00 PM', '05:30 PM',
+  '06:00 PM', '06:30 PM', '07:00 PM', '07:30 PM'
+];
 
 export default function DoctorDetailPage() {
   const { id } = useParams();
@@ -26,7 +45,9 @@ export default function DoctorDetailPage() {
     patient_name: user?.name || '',
     patient_email: user?.email || '',
     patient_phone: user?.phone || '',
+    appointment_type: 'New Consultation',
     preferred_date: '',
+    preferred_time: '',
     symptoms: ''
   });
 
@@ -271,6 +292,24 @@ export default function DoctorDetailPage() {
                 </div>
                 
                 <div>
+                  <Label htmlFor="appointment_type">Appointment Type *</Label>
+                  <Select
+                    value={formData.appointment_type}
+                    onValueChange={(value) => setFormData({...formData, appointment_type: value})}
+                  >
+                    <SelectTrigger className="rounded-xl mt-2" data-testid="input-appointment-type">
+                      <SelectValue placeholder="Select appointment type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {APPOINTMENT_TYPES.map((type) => (
+                        <SelectItem key={type} value={type}>{type}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <p className="text-xs text-muted-foreground mt-1">Duration: 10-15 minutes</p>
+                </div>
+                
+                <div>
                   <Label htmlFor="preferred_date">Preferred Date *</Label>
                   <Input
                     id="preferred_date"
@@ -282,6 +321,27 @@ export default function DoctorDetailPage() {
                     className="rounded-xl mt-2"
                     data-testid="input-date"
                   />
+                </div>
+                
+                <div>
+                  <Label htmlFor="preferred_time">Preferred Time *</Label>
+                  <Select
+                    value={formData.preferred_time}
+                    onValueChange={(value) => setFormData({...formData, preferred_time: value})}
+                  >
+                    <SelectTrigger className="rounded-xl mt-2" data-testid="input-time">
+                      <SelectValue placeholder="Select time slot" />
+                    </SelectTrigger>
+                    <SelectContent className="max-h-60">
+                      {TIME_SLOTS.map((time) => (
+                        <SelectItem key={time} value={time}>{time}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
+                    <Clock className="h-3 w-3" />
+                    Clinic hours: 10:00 AM - 8:00 PM (Mon-Sat)
+                  </p>
                 </div>
                 
                 <div>

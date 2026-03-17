@@ -38,6 +38,16 @@ class AppointmentStatus(str, Enum):
     APPROVED = "approved"
     REJECTED = "rejected"
     COMPLETED = "completed"
+    CANCELLED = "cancelled"
+
+class AppointmentType(str, Enum):
+    NEW_CONSULTATION = "New Consultation"
+    BLOOD_TEST = "Blood Test"
+    ECG = "ECG"
+    XRAY = "X-Ray"
+    INJECTION = "Injection"
+    DRESSING = "Dressing"
+    MEDICINE = "Medicine"
 
 class User(BaseModel):
     model_config = ConfigDict(extra="ignore")
@@ -68,6 +78,7 @@ class Doctor(BaseModel):
     qualifications: str
     image_url: Optional[str] = None
     available_days: List[str] = []
+    accepts_online_booking: bool = True
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 class Appointment(BaseModel):
@@ -80,8 +91,11 @@ class Appointment(BaseModel):
     doctor_id: str
     doctor_name: str
     doctor_specialization: str
+    appointment_type: AppointmentType = AppointmentType.NEW_CONSULTATION
     preferred_date: str
+    preferred_time: Optional[str] = None
     symptoms: str
+    duration_minutes: int = 15
     status: AppointmentStatus = AppointmentStatus.PENDING
     admin_notes: Optional[str] = None
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
@@ -92,7 +106,9 @@ class AppointmentCreate(BaseModel):
     patient_email: EmailStr
     patient_phone: str
     doctor_id: str
+    appointment_type: AppointmentType = AppointmentType.NEW_CONSULTATION
     preferred_date: str
+    preferred_time: Optional[str] = None
     symptoms: str = ""
     patient_id: Optional[str] = None
 
@@ -216,11 +232,16 @@ async def create_appointment(appointment_data: AppointmentCreate):
     if not doctor:
         raise HTTPException(status_code=404, detail="Doctor not found")
     
+    # Check if doctor accepts online booking
+    if not doctor.get('accepts_online_booking', True):
+        raise HTTPException(status_code=400, detail="This doctor does not accept online bookings. Please call the clinic.")
+    
     appointment_dict = appointment_data.model_dump()
     appointment = Appointment(
         **appointment_dict,
         doctor_name=doctor['name'],
-        doctor_specialization=doctor['specialization']
+        doctor_specialization=doctor['specialization'],
+        duration_minutes=15
     )
     
     doc = appointment.model_dump()

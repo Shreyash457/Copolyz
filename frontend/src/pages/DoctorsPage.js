@@ -24,12 +24,14 @@ export default function DoctorsPage() {
   const fetchDoctors = async () => {
     try {
       const response = await axios.get(`${API}/doctors`);
-      setDoctors(response.data);
+      // Filter only doctors who accept online booking
+      const onlineDoctors = response.data.filter(doc => doc.accepts_online_booking !== false);
+      setDoctors(onlineDoctors);
       
       // Fetch ratings for all doctors
       const ratingsData = {};
       await Promise.all(
-        response.data.map(async (doctor) => {
+        onlineDoctors.map(async (doctor) => {
           try {
             const ratingRes = await axios.get(`${API}/doctors/${doctor.id}/rating`);
             ratingsData[doctor.id] = ratingRes.data;
