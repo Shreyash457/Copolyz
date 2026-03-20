@@ -86,7 +86,7 @@ class Appointment(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     patient_id: Optional[str] = None
     patient_name: str
-    patient_email: str
+    patient_email: Optional[str] = None
     patient_phone: str
     doctor_id: str
     doctor_name: str
@@ -103,7 +103,7 @@ class Appointment(BaseModel):
 
 class AppointmentCreate(BaseModel):
     patient_name: str
-    patient_email: EmailStr
+    patient_email: Optional[str] = None
     patient_phone: str
     doctor_id: str
     appointment_type: AppointmentType = AppointmentType.NEW_CONSULTATION

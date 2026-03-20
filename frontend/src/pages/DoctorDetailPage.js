@@ -44,7 +44,6 @@ export default function DoctorDetailPage() {
   const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState({
     patient_name: user?.name || '',
-    patient_email: user?.email || '',
     patient_phone: user?.phone || '',
     appointment_type: 'New Consultation',
     preferred_date: '',
@@ -63,7 +62,6 @@ export default function DoctorDetailPage() {
       setFormData(prev => ({
         ...prev,
         patient_name: user.name,
-        patient_email: user.email,
         patient_phone: user.phone
       }));
     }
@@ -251,16 +249,6 @@ export default function DoctorDetailPage() {
                 Fill the form below to book your appointment / নিচের ফর্মটি পূরণ করুন
               </p>
               
-              {!user && (
-                <div className="bg-amber-50 border-2 border-amber-300 rounded-xl p-4 mb-6" data-testid="guest-notice">
-                  <p className="text-sm text-amber-900">
-                    <strong>Guest Booking / অতিথি বুকিং:</strong> You can book as a guest, but we recommend creating an account to track your appointments.
-                    <br />
-                    <span className="text-xs">আপনি অতিথি হিসেবে বুক করতে পারেন, তবে আমরা আপনার অ্যাপয়েন্টমেন্ট ট্র্যাক করতে একটি অ্যাকাউন্ট তৈরি করার পরামর্শ দিই।</span>
-                  </p>
-                </div>
-              )}
-              
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
                   <Label htmlFor="patient_name">Full Name / পুরো নাম *</Label>
@@ -272,20 +260,6 @@ export default function DoctorDetailPage() {
                     className="rounded-xl mt-2"
                     placeholder="Enter your full name / আপনার পুরো নাম লিখুন"
                     data-testid="input-name"
-                  />
-                </div>
-                
-                <div>
-                  <Label htmlFor="patient_email">Email / ইমেইল *</Label>
-                  <Input
-                    id="patient_email"
-                    type="email"
-                    value={formData.patient_email}
-                    onChange={(e) => setFormData({...formData, patient_email: e.target.value})}
-                    required
-                    className="rounded-xl mt-2"
-                    placeholder="example@email.com"
-                    data-testid="input-email"
                   />
                 </div>
                 

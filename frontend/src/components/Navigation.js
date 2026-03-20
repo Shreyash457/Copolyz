@@ -18,8 +18,7 @@ export const Navigation = () => {
           <div className="flex items-center gap-1 md:gap-2 flex-shrink-0">
             <Link to="/">
               <Button variant="ghost" size="sm" className="rounded-full px-2 py-1 h-8 text-xs" data-testid="nav-home">
-                <span className="hidden md:inline">Home</span>
-                <span className="md:hidden">Home</span>
+                Home
               </Button>
             </Link>
             <Link to="/doctors">
@@ -28,7 +27,7 @@ export const Navigation = () => {
               </Button>
             </Link>
             
-            {user ? (
+            {user && (
               <>
                 <Link to={user.role === 'admin' ? '/admin/dashboard' : '/patient/dashboard'}>
                   <Button variant="ghost" size="sm" className="rounded-full px-2 py-1 h-8 text-xs" data-testid="nav-dashboard">
@@ -44,19 +43,6 @@ export const Navigation = () => {
                 >
                   <LogOut className="h-3 w-3" />
                 </Button>
-              </>
-            ) : (
-              <>
-                <Link to="/login">
-                  <Button variant="ghost" size="sm" className="rounded-full px-2 py-1 h-8 text-xs" data-testid="nav-login">
-                    Login
-                  </Button>
-                </Link>
-                <Link to="/signup">
-                  <Button size="sm" className="rounded-full shadow-md shadow-primary/20 px-3 py-1 h-8 text-xs font-medium whitespace-nowrap" data-testid="nav-signup">
-                    Sign Up
-                  </Button>
-                </Link>
               </>
             )}
           </div>

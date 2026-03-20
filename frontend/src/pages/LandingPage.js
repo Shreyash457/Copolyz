@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Phone, MapPin, Clock, Stethoscope, Heart, Users, Award } from 'lucide-react';
+import { Phone, MapPin, Clock, Stethoscope, Heart, Users, Award, Activity, Droplet } from 'lucide-react';
 import Navigation from '../components/Navigation';
 
 export default function LandingPage() {
@@ -23,80 +23,93 @@ export default function LandingPage() {
       <Navigation />
       
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-primary-50 to-secondary-100">
-        <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-24 py-16 md:py-24">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div className="z-10">
-              <p className="text-sm font-medium tracking-wide uppercase text-primary mb-4" data-testid="hero-subtitle">WELCOME TO</p>
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-light tracking-tight leading-[1.1] mb-6" data-testid="hero-title">
-                Coochbehar <br />
-                <span className="font-semibold text-primary">Polyclinic</span>
-              </h1>
-              <p className="text-base md:text-lg leading-relaxed text-muted-foreground mb-8 max-w-xl" data-testid="hero-description">
-                Experience comprehensive healthcare with our team of 20+ specialized doctors. 
-                Your health and peace of mind are our priority.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Link to="/doctors">
-                  <Button 
-                    size="lg" 
-                    className="rounded-full px-8 py-6 text-base md:text-lg shadow-lg shadow-primary/20 hover:scale-105 transition-transform w-full sm:w-auto"
-                    data-testid="book-appointment-btn"
-                  >
-                    Book Appointment / অ্যাপয়েন্টমেন্ট বুক করুন
-                  </Button>
-                </Link>
-                <Button 
-                  asChild
-                  variant="outline" 
-                  size="lg" 
-                  className="rounded-full px-8 py-6 text-base md:text-lg border-2 hover:bg-secondary/50 w-full sm:w-auto"
-                  data-testid="call-now-btn"
-                >
-                  <a href="tel:03582469726">
-                    <Phone className="mr-2 h-5 w-5" />
-                    Call Now / কল করুন
-                  </a>
-                </Button>
-              </div>
-            </div>
-            
-            <div className="hidden lg:flex justify-center items-center">
-              <div className="relative w-full aspect-square max-w-md">
-                <div className="absolute inset-0 bg-primary/10 rounded-full blur-3xl"></div>
-                <div className="relative bg-white rounded-3xl shadow-2xl p-8 border border-primary/10">
-                  <div className="space-y-6">
-                    <div className="flex items-center gap-4 p-4 bg-primary/5 rounded-2xl">
-                      <div className="bg-primary text-primary-foreground p-3 rounded-full">
-                        <Stethoscope className="h-6 w-6" />
-                      </div>
-                      <div>
-                        <p className="font-semibold">20+ Specialists</p>
-                        <p className="text-sm text-muted-foreground">Expert Doctors</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-4 p-4 bg-primary/5 rounded-2xl">
-                      <div className="bg-primary text-primary-foreground p-3 rounded-full">
-                        <Heart className="h-6 w-6" />
-                      </div>
-                      <div>
-                        <p className="font-semibold">Quality Care</p>
-                        <p className="text-sm text-muted-foreground">Patient-Centered</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-4 p-4 bg-primary/5 rounded-2xl">
-                      <div className="bg-primary text-primary-foreground p-3 rounded-full">
-                        <Award className="h-6 w-6" />
-                      </div>
-                      <div>
-                        <p className="font-semibold">Easy Booking</p>
-                        <p className="text-sm text-muted-foreground">Quick & Simple</p>
-                      </div>
-                    </div>
+      <section className="relative overflow-hidden bg-gradient-to-br from-primary-50 to-secondary-100 py-8 md:py-12">
+        <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-24">
+          <div className="text-center mb-8">
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-light tracking-tight leading-tight mb-3" data-testid="hero-title">
+              <span className="font-semibold text-primary">Coochbehar Polyclinic</span>
+            </h1>
+            <p className="text-base md:text-lg text-muted-foreground">
+              Quality Healthcare Services / মানসম্মত স্বাস্থ্যসেবা
+            </p>
+          </div>
+
+          {/* 4 Major Service Sections - Red & Eye-catching */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
+            {/* X-Ray */}
+            <Link to="/doctors?type=xray">
+              <div className="group relative bg-gradient-to-br from-red-600 to-red-700 text-white rounded-3xl p-6 md:p-8 shadow-2xl hover:shadow-red-500/50 hover:scale-105 transition-all duration-300 cursor-pointer overflow-hidden" data-testid="service-xray">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16"></div>
+                <div className="relative z-10">
+                  <div className="bg-white/20 backdrop-blur-sm w-14 h-14 md:w-16 md:h-16 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                    <Activity className="h-7 w-7 md:h-9 md:w-9" />
                   </div>
+                  <h3 className="text-xl md:text-2xl font-bold mb-2">X-Ray</h3>
+                  <p className="text-sm md:text-base text-white/90">এক্স-রে</p>
+                  <p className="text-xs md:text-sm text-white/80 mt-2">Digital Imaging</p>
                 </div>
               </div>
-            </div>
+            </Link>
+
+            {/* Blood Test */}
+            <Link to="/doctors?type=bloodtest">
+              <div className="group relative bg-gradient-to-br from-red-600 to-red-700 text-white rounded-3xl p-6 md:p-8 shadow-2xl hover:shadow-red-500/50 hover:scale-105 transition-all duration-300 cursor-pointer overflow-hidden" data-testid="service-bloodtest">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16"></div>
+                <div className="relative z-10">
+                  <div className="bg-white/20 backdrop-blur-sm w-14 h-14 md:w-16 md:h-16 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                    <Droplet className="h-7 w-7 md:h-9 md:w-9" />
+                  </div>
+                  <h3 className="text-xl md:text-2xl font-bold mb-2">Blood Test</h3>
+                  <p className="text-sm md:text-base text-white/90">রক্ত পরীক্ষা</p>
+                  <p className="text-xs md:text-sm text-white/80 mt-2">Lab Analysis</p>
+                </div>
+              </div>
+            </Link>
+
+            {/* ECG */}
+            <Link to="/doctors?type=ecg">
+              <div className="group relative bg-gradient-to-br from-red-600 to-red-700 text-white rounded-3xl p-6 md:p-8 shadow-2xl hover:shadow-red-500/50 hover:scale-105 transition-all duration-300 cursor-pointer overflow-hidden" data-testid="service-ecg">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16"></div>
+                <div className="relative z-10">
+                  <div className="bg-white/20 backdrop-blur-sm w-14 h-14 md:w-16 md:h-16 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                    <Heart className="h-7 w-7 md:h-9 md:w-9" />
+                  </div>
+                  <h3 className="text-xl md:text-2xl font-bold mb-2">ECG</h3>
+                  <p className="text-sm md:text-base text-white/90">ইসিজি</p>
+                  <p className="text-xs md:text-sm text-white/80 mt-2">Heart Test</p>
+                </div>
+              </div>
+            </Link>
+
+            {/* Doctor Booking */}
+            <Link to="/doctors">
+              <div className="group relative bg-gradient-to-br from-red-600 to-red-700 text-white rounded-3xl p-6 md:p-8 shadow-2xl hover:shadow-red-500/50 hover:scale-105 transition-all duration-300 cursor-pointer overflow-hidden" data-testid="service-doctor">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16"></div>
+                <div className="relative z-10">
+                  <div className="bg-white/20 backdrop-blur-sm w-14 h-14 md:w-16 md:h-16 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                    <Stethoscope className="h-7 w-7 md:h-9 md:w-9" />
+                  </div>
+                  <h3 className="text-xl md:text-2xl font-bold mb-2">Doctor</h3>
+                  <p className="text-sm md:text-base text-white/90">ডাক্তার</p>
+                  <p className="text-xs md:text-sm text-white/80 mt-2">Book Now</p>
+                </div>
+              </div>
+            </Link>
+          </div>
+
+          {/* Call Now Button */}
+          <div className="text-center">
+            <Button 
+              asChild
+              size="lg" 
+              className="rounded-full px-8 py-6 text-base md:text-lg border-2 border-primary bg-white text-primary hover:bg-primary hover:text-white transition-colors shadow-lg"
+              data-testid="call-now-btn"
+            >
+              <a href="tel:03582469726">
+                <Phone className="mr-2 h-5 w-5" />
+                Call Now / কল করুন
+              </a>
+            </Button>
           </div>
         </div>
       </section>
