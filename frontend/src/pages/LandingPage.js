@@ -36,8 +36,8 @@ export default function LandingPage() {
 
           {/* 4 Major Service Sections - Red & Eye-catching */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
-            {/* X-Ray */}
-            <Link to="/doctors?type=xray">
+            {/* X-Ray - Direct to booking */}
+            <Link to="/book?type=xray">
               <div className="group relative bg-gradient-to-br from-red-600 to-red-700 text-white rounded-3xl p-6 md:p-8 shadow-2xl hover:shadow-red-500/50 hover:scale-105 transition-all duration-300 cursor-pointer overflow-hidden" data-testid="service-xray">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16"></div>
                 <div className="relative z-10">
@@ -46,13 +46,13 @@ export default function LandingPage() {
                   </div>
                   <h3 className="text-xl md:text-2xl font-bold mb-2">X-Ray</h3>
                   <p className="text-sm md:text-base text-white/90">এক্স-রে</p>
-                  <p className="text-xs md:text-sm text-white/80 mt-2">Digital Imaging</p>
+                  <p className="text-xs md:text-sm text-white/80 mt-2">Book Now</p>
                 </div>
               </div>
             </Link>
 
-            {/* Blood Test */}
-            <Link to="/doctors?type=bloodtest">
+            {/* Blood Test - Direct to booking */}
+            <Link to="/book?type=bloodtest">
               <div className="group relative bg-gradient-to-br from-red-600 to-red-700 text-white rounded-3xl p-6 md:p-8 shadow-2xl hover:shadow-red-500/50 hover:scale-105 transition-all duration-300 cursor-pointer overflow-hidden" data-testid="service-bloodtest">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16"></div>
                 <div className="relative z-10">
@@ -61,13 +61,13 @@ export default function LandingPage() {
                   </div>
                   <h3 className="text-xl md:text-2xl font-bold mb-2">Blood Test</h3>
                   <p className="text-sm md:text-base text-white/90">রক্ত পরীক্ষা</p>
-                  <p className="text-xs md:text-sm text-white/80 mt-2">Lab Analysis</p>
+                  <p className="text-xs md:text-sm text-white/80 mt-2">Book Now</p>
                 </div>
               </div>
             </Link>
 
-            {/* ECG */}
-            <Link to="/doctors?type=ecg">
+            {/* ECG - Direct to booking */}
+            <Link to="/book?type=ecg">
               <div className="group relative bg-gradient-to-br from-red-600 to-red-700 text-white rounded-3xl p-6 md:p-8 shadow-2xl hover:shadow-red-500/50 hover:scale-105 transition-all duration-300 cursor-pointer overflow-hidden" data-testid="service-ecg">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16"></div>
                 <div className="relative z-10">
@@ -76,7 +76,7 @@ export default function LandingPage() {
                   </div>
                   <h3 className="text-xl md:text-2xl font-bold mb-2">ECG</h3>
                   <p className="text-sm md:text-base text-white/90">ইসিজি</p>
-                  <p className="text-xs md:text-sm text-white/80 mt-2">Heart Test</p>
+                  <p className="text-xs md:text-sm text-white/80 mt-2">Book Now</p>
                 </div>
               </div>
             </Link>

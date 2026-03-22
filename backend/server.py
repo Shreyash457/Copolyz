@@ -6,6 +6,7 @@ from motor.motor_asyncio import AsyncIOMotorClient
 import os
 import logging
 import requests
+import httpx
 from pathlib import Path
 from pydantic import BaseModel, Field, ConfigDict, EmailStr
 from typing import List, Optional
@@ -228,20 +229,28 @@ async def get_doctor(doctor_id: str):
     return Doctor(**doctor)
 
 @api_router.post("/appointments", response_model=Appointment)
-async def create_appointment(appointment_data: AppointmentCreate):
-    doctor = await db.doctors.find_one({"id": appointment_data.doctor_id}, {"_id": 0})
-    if not doctor:
-        raise HTTPException(status_code=404, detail="Doctor not found")
-    
-    # Check if doctor accepts online booking
-    if not doctor.get('accepts_online_booking', True):
-        raise HTTPException(status_code=400, detail="This doctor does not accept online bookings. Please call the clinic.")
+async def create_appointment(appointment_data: AppointmentCreate, background_tasks: BackgroundTasks):
+    # Handle service bookings (X-ray, Blood Test, ECG) without a specific doctor
+    if appointment_data.doctor_id == 'general-services':
+        doctor_name = "General Services"
+        doctor_specialization = appointment_data.appointment_type.value if hasattr(appointment_data.appointment_type, 'value') else str(appointment_data.appointment_type)
+    else:
+        doctor = await db.doctors.find_one({"id": appointment_data.doctor_id}, {"_id": 0})
+        if not doctor:
+            raise HTTPException(status_code=404, detail="Doctor not found")
+        
+        # Check if doctor accepts online booking
+        if not doctor.get('accepts_online_booking', True):
+            raise HTTPException(status_code=400, detail="This doctor does not accept online bookings. Please call the clinic.")
+        
+        doctor_name = doctor['name']
+        doctor_specialization = doctor['specialization']
     
     appointment_dict = appointment_data.model_dump()
     appointment = Appointment(
         **appointment_dict,
-        doctor_name=doctor['name'],
-        doctor_specialization=doctor['specialization'],
+        doctor_name=doctor_name,
+        doctor_specialization=doctor_specialization,
         duration_minutes=15
     )
     
@@ -250,7 +259,61 @@ async def create_appointment(appointment_data: AppointmentCreate):
     doc['updated_at'] = doc['updated_at'].isoformat()
     
     await db.appointments.insert_one(doc)
+    
+    # Send Telegram notification in background
+    background_tasks.add_task(send_telegram_notification, appointment)
+    
     return appointment
+
+
+async def send_telegram_notification(appointment: Appointment):
+    """Send Telegram notification to clinic about new appointment"""
+    telegram_token = os.environ.get('TELEGRAM_BOT_TOKEN')
+    telegram_chat_id = os.environ.get('TELEGRAM_CHAT_ID')
+    
+    if not telegram_token or not telegram_chat_id:
+        logger.warning("Telegram credentials not configured, skipping notification")
+        return
+    
+    try:
+        # Format the appointment type
+        apt_type = appointment.appointment_type.value if hasattr(appointment.appointment_type, 'value') else str(appointment.appointment_type)
+        
+        # Create notification message
+        message = f"""🏥 *New Appointment Booked!*
+
+📋 *Patient Details:*
+• Name: {appointment.patient_name}
+• Phone: {appointment.patient_phone}
+
+📅 *Appointment Details:*
+• Type: {apt_type}
+• Doctor: {appointment.doctor_name}
+• Date: {appointment.preferred_date}
+• Time: {appointment.preferred_time or 'Not specified'}
+
+📝 *Notes:* {appointment.symptoms or 'None'}
+
+---
+_Booked at: {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M UTC')}_"""
+
+        # Send message via Telegram API
+        url = f"https://api.telegram.org/bot{telegram_token}/sendMessage"
+        payload = {
+            "chat_id": telegram_chat_id,
+            "text": message,
+            "parse_mode": "Markdown"
+        }
+        
+        async with httpx.AsyncClient() as client:
+            response = await client.post(url, json=payload, timeout=10)
+            if response.status_code == 200:
+                logger.info(f"Telegram notification sent for appointment {appointment.id}")
+            else:
+                logger.error(f"Failed to send Telegram notification: {response.text}")
+                
+    except Exception as e:
+        logger.error(f"Error sending Telegram notification: {str(e)}")
 
 @api_router.get("/appointments", response_model=List[Appointment])
 async def get_appointments(current_user: dict = Depends(get_current_user)):
