@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 import Navigation from '../components/Navigation';
 import { Button } from '@/components/ui/button';
-import { Stethoscope } from 'lucide-react';
+import { Stethoscope, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import StarRating from '../components/StarRating';
 
@@ -13,9 +13,13 @@ const API = `${BACKEND_URL}/api`;
 export default function DoctorsPage() {
   const [doctors, setDoctors] = useState([]);
   const [ratings, setRatings] = useState({});
+  const [availability, setAvailability] = useState({});
   const [loading, setLoading] = useState(true);
   const [selectedSpecialization, setSelectedSpecialization] = useState('all');
   const doctorsGridRef = useRef(null);
+  
+  // Get today's date for availability check
+  const today = new Date().toISOString().split('T')[0];
 
   useEffect(() => {
     fetchDoctors();
@@ -28,8 +32,10 @@ export default function DoctorsPage() {
       const onlineDoctors = response.data.filter(doc => doc.accepts_online_booking !== false);
       setDoctors(onlineDoctors);
       
-      // Fetch ratings for all doctors
+      // Fetch ratings and availability for all doctors
       const ratingsData = {};
+      const availabilityData = {};
+      
       await Promise.all(
         onlineDoctors.map(async (doctor) => {
           try {
@@ -38,9 +44,20 @@ export default function DoctorsPage() {
           } catch (err) {
             ratingsData[doctor.id] = { average_rating: 0, total_reviews: 0 };
           }
+          
+          // Check availability for doctors with daily limits
+          if (doctor.max_daily_appointments) {
+            try {
+              const availRes = await axios.get(`${API}/doctors/${doctor.id}/availability/${today}`);
+              availabilityData[doctor.id] = availRes.data;
+            } catch (err) {
+              availabilityData[doctor.id] = { is_available: true };
+            }
+          }
         })
       );
       setRatings(ratingsData);
+      setAvailability(availabilityData);
     } catch (error) {
       toast.error('Failed to load doctors');
       console.error(error);
@@ -106,13 +123,25 @@ export default function DoctorsPage() {
               </div>
             ) : (
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {filteredDoctors.map((doctor, index) => (
+                {filteredDoctors.map((doctor, index) => {
+                  const doctorAvail = availability[doctor.id];
+                  const isFullyBooked = doctorAvail && !doctorAvail.is_available;
+                  
+                  return (
                   <Link key={doctor.id} to={`/doctors/${doctor.id}`}>
                     <div 
-                      className="group relative overflow-hidden rounded-3xl bg-white shadow-md hover:shadow-2xl transition-all duration-300 cursor-pointer border border-border/40 animate-fadeIn"
+                      className={`group relative overflow-hidden rounded-3xl bg-white shadow-md hover:shadow-2xl transition-all duration-300 cursor-pointer border border-border/40 animate-fadeIn ${isFullyBooked ? 'opacity-75' : ''}`}
                       style={{ animationDelay: `${index * 50}ms` }}
                       data-testid={`doctor-card-${doctor.id}`}
                     >
+                      {/* Fully Booked Badge */}
+                      {isFullyBooked && (
+                        <div className="absolute top-4 right-4 bg-red-500 text-white px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1 z-10" data-testid={`fully-booked-${doctor.id}`}>
+                          <AlertCircle className="h-3 w-3" />
+                          Fully Booked Today
+                        </div>
+                      )}
+                      
                       <div className="p-8">
                         <div className="flex items-start gap-3 mb-4">
                           <div className="bg-primary/10 p-3 rounded-full group-hover:scale-110 transition-transform duration-300">
@@ -131,16 +160,28 @@ export default function DoctorsPage() {
                           </div>
                         </div>
                         <p className="text-sm text-muted-foreground mb-4" data-testid={`doctor-qual-${doctor.id}`}>{doctor.qualifications}</p>
+                        
+                        {/* Availability info for limited doctors */}
+                        {doctor.max_daily_appointments && doctorAvail && (
+                          <p className={`text-xs mb-3 ${isFullyBooked ? 'text-red-600' : 'text-green-600'}`}>
+                            {isFullyBooked 
+                              ? `Fully booked for today (${doctorAvail.appointments_booked}/${doctor.max_daily_appointments} slots)`
+                              : `${doctor.max_daily_appointments - doctorAvail.appointments_booked} slots available today`
+                            }
+                          </p>
+                        )}
+                        
                         <Button 
-                          className="w-full rounded-full group-hover:scale-105 transition-transform duration-300"
+                          className={`w-full rounded-full group-hover:scale-105 transition-transform duration-300 ${isFullyBooked ? 'bg-gray-400 hover:bg-gray-500' : ''}`}
                           data-testid={`book-btn-${doctor.id}`}
                         >
-                          Book Appointment
+                          {isFullyBooked ? 'View Details' : 'Book Appointment'}
                         </Button>
                       </div>
                     </div>
                   </Link>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>

@@ -1,4 +1,4 @@
-from fastapi import FastAPI, APIRouter, HTTPException, Depends, status, BackgroundTasks
+from fastapi import FastAPI, APIRouter, HTTPException, Depends, BackgroundTasks
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
@@ -81,7 +81,22 @@ class Doctor(BaseModel):
     image_url: Optional[str] = None
     available_days: List[str] = []
     accepts_online_booking: bool = True
+    max_daily_appointments: Optional[int] = None  # None means unlimited
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class BlockedSlot(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    date: str  # YYYY-MM-DD format
+    time_slot: str  # e.g., "10:00 AM"
+    reason: Optional[str] = None
+    created_by: Optional[str] = None
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class BlockedSlotCreate(BaseModel):
+    date: str
+    time_slot: str
+    reason: Optional[str] = None
 
 class Appointment(BaseModel):
     model_config = ConfigDict(extra="ignore")
@@ -243,8 +258,35 @@ async def create_appointment(appointment_data: AppointmentCreate, background_tas
         if not doctor.get('accepts_online_booking', True):
             raise HTTPException(status_code=400, detail="This doctor does not accept online bookings. Please call the clinic.")
         
+        # Check if doctor has daily appointment limit
+        max_daily = doctor.get('max_daily_appointments')
+        if max_daily is not None:
+            # Count existing appointments for this doctor on the requested date
+            existing_count = await db.appointments.count_documents({
+                "doctor_id": appointment_data.doctor_id,
+                "preferred_date": appointment_data.preferred_date,
+                "status": {"$nin": ["cancelled", "rejected"]}
+            })
+            if existing_count >= max_daily:
+                raise HTTPException(
+                    status_code=400, 
+                    detail=f"Dr. {doctor['name']} is fully booked for {appointment_data.preferred_date}. Maximum {max_daily} appointments per day."
+                )
+        
         doctor_name = doctor['name']
         doctor_specialization = doctor['specialization']
+    
+    # Check if the time slot is blocked
+    if appointment_data.preferred_time:
+        blocked = await db.blocked_slots.find_one({
+            "date": appointment_data.preferred_date,
+            "time_slot": appointment_data.preferred_time
+        }, {"_id": 0})
+        if blocked:
+            raise HTTPException(
+                status_code=400,
+                detail=f"The time slot {appointment_data.preferred_time} on {appointment_data.preferred_date} is not available."
+            )
     
     appointment_dict = appointment_data.model_dump()
     appointment = Appointment(
@@ -417,6 +459,138 @@ async def get_doctor_rating(doctor_id: str):
     average_rating = round(total_rating / len(reviews), 1)
     
     return {"average_rating": average_rating, "total_reviews": len(reviews)}
+
+
+# ============ BLOCKED SLOTS MANAGEMENT ============
+
+@api_router.get("/blocked-slots")
+async def get_blocked_slots(date: Optional[str] = None):
+    """Get all blocked slots, optionally filtered by date"""
+    query = {}
+    if date:
+        query["date"] = date
+    
+    slots = await db.blocked_slots.find(query, {"_id": 0}).sort("date", 1).to_list(1000)
+    return slots
+
+
+@api_router.post("/blocked-slots")
+async def create_blocked_slot(slot_data: BlockedSlotCreate, current_user: dict = Depends(get_current_user)):
+    """Block a time slot (admin only)"""
+    if current_user['role'] not in ['admin', 'doctor']:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    # Check if slot already blocked
+    existing = await db.blocked_slots.find_one({
+        "date": slot_data.date,
+        "time_slot": slot_data.time_slot
+    }, {"_id": 0})
+    
+    if existing:
+        raise HTTPException(status_code=400, detail="This time slot is already blocked")
+    
+    blocked_slot = BlockedSlot(
+        date=slot_data.date,
+        time_slot=slot_data.time_slot,
+        reason=slot_data.reason,
+        created_by=current_user['user_id']
+    )
+    
+    doc = blocked_slot.model_dump()
+    doc['created_at'] = doc['created_at'].isoformat()
+    
+    await db.blocked_slots.insert_one(doc)
+    return {"message": "Time slot blocked successfully", "slot": doc}
+
+
+@api_router.delete("/blocked-slots/{slot_id}")
+async def delete_blocked_slot(slot_id: str, current_user: dict = Depends(get_current_user)):
+    """Unblock a time slot (admin only)"""
+    if current_user['role'] not in ['admin', 'doctor']:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    result = await db.blocked_slots.delete_one({"id": slot_id})
+    
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Blocked slot not found")
+    
+    return {"message": "Time slot unblocked successfully"}
+
+
+@api_router.get("/availability/{date}")
+async def get_availability(date: str):
+    """Get available time slots for a specific date"""
+    all_time_slots = [
+        '10:00 AM', '10:30 AM', '11:00 AM', '11:30 AM',
+        '12:00 PM', '12:30 PM', '01:00 PM', '01:30 PM',
+        '02:00 PM', '02:30 PM', '03:00 PM', '03:30 PM',
+        '04:00 PM', '04:30 PM', '05:00 PM', '05:30 PM',
+        '06:00 PM', '06:30 PM', '07:00 PM', '07:30 PM'
+    ]
+    
+    # Get blocked slots for this date
+    blocked = await db.blocked_slots.find({"date": date}, {"_id": 0, "time_slot": 1}).to_list(100)
+    blocked_times = [b['time_slot'] for b in blocked]
+    
+    # Get booked slots for this date (appointments that are not cancelled/rejected)
+    booked = await db.appointments.find({
+        "preferred_date": date,
+        "status": {"$nin": ["cancelled", "rejected"]},
+        "preferred_time": {"$ne": None}
+    }, {"_id": 0, "preferred_time": 1}).to_list(1000)
+    booked_times = [b['preferred_time'] for b in booked]
+    
+    available_slots = []
+    for slot in all_time_slots:
+        status = "available"
+        if slot in blocked_times:
+            status = "blocked"
+        elif slot in booked_times:
+            status = "booked"
+        available_slots.append({"time": slot, "status": status})
+    
+    return {"date": date, "slots": available_slots}
+
+
+@api_router.get("/doctors/{doctor_id}/availability/{date}")
+async def get_doctor_availability(doctor_id: str, date: str):
+    """Check if a doctor is available on a specific date (checks daily limits)"""
+    doctor = await db.doctors.find_one({"id": doctor_id}, {"_id": 0})
+    if not doctor:
+        raise HTTPException(status_code=404, detail="Doctor not found")
+    
+    max_daily = doctor.get('max_daily_appointments')
+    
+    if max_daily is None:
+        return {
+            "doctor_id": doctor_id,
+            "doctor_name": doctor['name'],
+            "date": date,
+            "is_available": doctor.get('accepts_online_booking', True),
+            "appointments_booked": 0,
+            "max_daily_appointments": None,
+            "message": "Available for booking" if doctor.get('accepts_online_booking', True) else "Does not accept online bookings"
+        }
+    
+    # Count existing appointments
+    existing_count = await db.appointments.count_documents({
+        "doctor_id": doctor_id,
+        "preferred_date": date,
+        "status": {"$nin": ["cancelled", "rejected"]}
+    })
+    
+    is_available = existing_count < max_daily and doctor.get('accepts_online_booking', True)
+    
+    return {
+        "doctor_id": doctor_id,
+        "doctor_name": doctor['name'],
+        "date": date,
+        "is_available": is_available,
+        "appointments_booked": existing_count,
+        "max_daily_appointments": max_daily,
+        "message": f"Fully booked for {date}" if not is_available else f"{max_daily - existing_count} slots remaining"
+    }
+
 
 @api_router.get("/")
 async def root():
