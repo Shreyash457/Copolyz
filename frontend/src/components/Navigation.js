@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '../contexts/AuthContext';
-import { LogOut, User } from 'lucide-react';
+import { LogOut, User, Lock } from 'lucide-react';
 
 export const Navigation = () => {
   const { user, logout } = useAuth();
@@ -27,11 +27,12 @@ export const Navigation = () => {
               </Button>
             </Link>
             
-            {user && (
+            {user ? (
               <>
                 <Link to={user.role === 'admin' ? '/admin/dashboard' : '/patient/dashboard'}>
                   <Button variant="ghost" size="sm" className="rounded-full px-2 py-1 h-8 text-xs" data-testid="nav-dashboard">
-                    <User className="h-3 w-3" />
+                    <User className="h-3 w-3 mr-1" />
+                    <span className="hidden sm:inline">Dashboard</span>
                   </Button>
                 </Link>
                 <Button 
@@ -44,6 +45,13 @@ export const Navigation = () => {
                   <LogOut className="h-3 w-3" />
                 </Button>
               </>
+            ) : (
+              <Link to="/login">
+                <Button variant="ghost" size="sm" className="rounded-full px-2 py-1 h-8 text-xs text-muted-foreground hover:text-primary" data-testid="nav-staff-login">
+                  <Lock className="h-3 w-3 mr-1" />
+                  <span className="hidden sm:inline">Staff</span>
+                </Button>
+              </Link>
             )}
           </div>
         </div>
