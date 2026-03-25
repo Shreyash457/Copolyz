@@ -5,7 +5,7 @@ import Navigation from '../components/Navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Calendar, Clock, User, CheckCircle, XCircle, FileText, Lock, Unlock, Plus, Trash2 } from 'lucide-react';
+import { Calendar, Clock, User, CheckCircle, XCircle, FileText, Lock, Unlock, Plus, Trash2, Key, Eye, EyeOff } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuth } from '../contexts/AuthContext';
 import {
@@ -57,6 +57,17 @@ export default function AdminDashboard() {
   const [blockReason, setBlockReason] = useState('');
   const [selectedSlotToBlock, setSelectedSlotToBlock] = useState('');
   const [isBlockDialogOpen, setIsBlockDialogOpen] = useState(false);
+  
+  // Change password state
+  const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false);
+  const [passwordData, setPasswordData] = useState({
+    current_password: '',
+    new_password: '',
+    confirm_password: ''
+  });
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [changingPassword, setChangingPassword] = useState(false);
 
   useEffect(() => {
     if (!authLoading) {
@@ -152,6 +163,42 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleChangePassword = async () => {
+    // Validation
+    if (!passwordData.current_password || !passwordData.new_password || !passwordData.confirm_password) {
+      toast.error('Please fill in all fields');
+      return;
+    }
+    
+    if (passwordData.new_password.length < 6) {
+      toast.error('New password must be at least 6 characters');
+      return;
+    }
+    
+    if (passwordData.new_password !== passwordData.confirm_password) {
+      toast.error('New passwords do not match');
+      return;
+    }
+    
+    setChangingPassword(true);
+    try {
+      await axios.post(`${API}/auth/change-password`, {
+        current_password: passwordData.current_password,
+        new_password: passwordData.new_password
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      toast.success('Password changed successfully!');
+      setIsPasswordDialogOpen(false);
+      setPasswordData({ current_password: '', new_password: '', confirm_password: '' });
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Failed to change password');
+    } finally {
+      setChangingPassword(false);
+    }
+  };
+
   const handleUpdateAppointment = async () => {
     try {
       await axios.patch(
@@ -201,11 +248,22 @@ export default function AdminDashboard() {
       
       <div className="px-6 md:px-12 lg:px-24 py-20">
         <div className="max-w-7xl mx-auto">
-          <div className="mb-12">
-            <h1 className="text-4xl md:text-5xl font-light tracking-tight mb-4" data-testid="admin-dashboard-title">
-              Admin <span className="font-semibold text-primary">Dashboard</span>
-            </h1>
-            <p className="text-lg text-muted-foreground">Manage appointments and time slots</p>
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-12">
+            <div>
+              <h1 className="text-4xl md:text-5xl font-light tracking-tight mb-4" data-testid="admin-dashboard-title">
+                Admin <span className="font-semibold text-primary">Dashboard</span>
+              </h1>
+              <p className="text-lg text-muted-foreground">Welcome, {user?.name || 'Admin'}</p>
+            </div>
+            <Button 
+              variant="outline" 
+              onClick={() => setIsPasswordDialogOpen(true)}
+              className="rounded-full"
+              data-testid="change-password-btn"
+            >
+              <Key className="h-4 w-4 mr-2" />
+              Change Password
+            </Button>
           </div>
 
           {/* Stats Cards */}
@@ -512,6 +570,83 @@ export default function AdminDashboard() {
               data-testid="update-submit-btn"
             >
               Update Appointment
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Change Password Dialog */}
+      <Dialog open={isPasswordDialogOpen} onOpenChange={setIsPasswordDialogOpen}>
+        <DialogContent className="sm:max-w-md" data-testid="password-dialog">
+          <DialogHeader>
+            <DialogTitle>Change Password</DialogTitle>
+            <DialogDescription>
+              Enter your current password and choose a new one
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            <div>
+              <label className="text-sm font-medium mb-2 block">Current Password</label>
+              <div className="relative">
+                <Input
+                  type={showCurrentPassword ? "text" : "password"}
+                  value={passwordData.current_password}
+                  onChange={(e) => setPasswordData({...passwordData, current_password: e.target.value})}
+                  className="rounded-xl pr-10"
+                  placeholder="Enter current password"
+                  data-testid="current-password-input"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                >
+                  {showCurrentPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
+            </div>
+            
+            <div>
+              <label className="text-sm font-medium mb-2 block">New Password</label>
+              <div className="relative">
+                <Input
+                  type={showNewPassword ? "text" : "password"}
+                  value={passwordData.new_password}
+                  onChange={(e) => setPasswordData({...passwordData, new_password: e.target.value})}
+                  className="rounded-xl pr-10"
+                  placeholder="Enter new password (min 6 characters)"
+                  data-testid="new-password-input"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowNewPassword(!showNewPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                >
+                  {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
+            </div>
+            
+            <div>
+              <label className="text-sm font-medium mb-2 block">Confirm New Password</label>
+              <Input
+                type="password"
+                value={passwordData.confirm_password}
+                onChange={(e) => setPasswordData({...passwordData, confirm_password: e.target.value})}
+                className="rounded-xl"
+                placeholder="Confirm new password"
+                data-testid="confirm-password-input"
+              />
+            </div>
+            
+            <Button 
+              onClick={handleChangePassword} 
+              className="w-full rounded-full"
+              disabled={changingPassword}
+              data-testid="change-password-submit-btn"
+            >
+              {changingPassword ? 'Changing...' : 'Change Password'}
             </Button>
           </div>
         </DialogContent>

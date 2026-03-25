@@ -224,6 +224,37 @@ async def get_me(current_user: dict = Depends(get_current_user)):
     
     return User(**user_doc).model_dump()
 
+
+class ChangePasswordRequest(BaseModel):
+    current_password: str
+    new_password: str
+
+
+@api_router.post("/auth/change-password")
+async def change_password(request: ChangePasswordRequest, current_user: dict = Depends(get_current_user)):
+    # Get user with password
+    user_doc = await db.users.find_one({"id": current_user['user_id']}, {"_id": 0})
+    if not user_doc:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Verify current password
+    if not verify_password(request.current_password, user_doc['password']):
+        raise HTTPException(status_code=400, detail="Current password is incorrect")
+    
+    # Validate new password
+    if len(request.new_password) < 6:
+        raise HTTPException(status_code=400, detail="New password must be at least 6 characters")
+    
+    # Hash and update new password
+    new_hashed = hash_password(request.new_password)
+    await db.users.update_one(
+        {"id": current_user['user_id']},
+        {"$set": {"password": new_hashed}}
+    )
+    
+    return {"message": "Password changed successfully"}
+
+
 @api_router.get("/doctors", response_model=List[Doctor])
 async def get_doctors():
     doctors = await db.doctors.find({}, {"_id": 0}).to_list(1000)
