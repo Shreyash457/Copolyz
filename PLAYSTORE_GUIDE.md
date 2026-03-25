@@ -1,71 +1,68 @@
-# Google Play Store Submission Guide
-## Coochbehar Polyclinic Android App (TWA)
+# Copolyz - Google Play Store Submission Guide
 
-This guide explains how to publish your web app to the Google Play Store using TWA (Trusted Web Activity).
+A complete guide to publish your **Copolyz** app (Coochbehar Polyclinic) to the Google Play Store using TWA (Trusted Web Activity).
+
+---
+
+## Table of Contents
+1. [Prerequisites](#prerequisites)
+2. [Step 1: Deploy to Production](#step-1-deploy-to-production)
+3. [Step 2: Create Android App with Bubblewrap](#step-2-create-android-app-with-bubblewrap)
+4. [Step 3: Configure Digital Asset Links](#step-3-configure-digital-asset-links)
+5. [Step 4: Submit to Play Store](#step-4-submit-to-play-store)
+6. [Required Assets Checklist](#required-assets-checklist)
 
 ---
 
 ## Prerequisites
 
-1. **Google Play Developer Account** - $25 one-time fee
-   - Create at: https://play.google.com/console
-   
-2. **Your website must be deployed** on a custom domain with HTTPS
-   - Current preview URL won't work for Play Store
-   - You need a domain like `coochbeharpolyclinic.com`
+Before starting, you need:
+
+| Requirement | Details |
+|-------------|---------|
+| **Google Play Developer Account** | $25 one-time fee → [Create Account](https://play.google.com/console) |
+| **Production Website** | Your app must be deployed on HTTPS with a custom domain |
+| **Node.js** | v16 or higher installed on your computer |
+| **Java JDK** | JDK 11 or higher (for Android build tools) |
+
+> ⚠️ **Important**: The preview URL won't work for Play Store. You need a real domain like `copolyz.com` or `coochbeharpolyclinic.com`
 
 ---
 
 ## Step 1: Deploy to Production
 
-Before creating the Android app, deploy your website to a permanent URL:
+Your website must be live on HTTPS before creating the Android app.
 
 ### Option A: Netlify (Recommended - Free)
-1. Go to https://netlify.com
-2. Connect your GitHub repository
-3. Deploy (auto-builds on push)
-4. Add custom domain if you have one
+
+1. Go to [netlify.com](https://netlify.com) and sign up
+2. Click **"Add new site"** → **"Import an existing project"**
+3. Connect your GitHub repository
+4. Build settings:
+   - **Base directory**: `frontend`
+   - **Build command**: `yarn build`
+   - **Publish directory**: `frontend/build`
+5. Click **Deploy site**
+6. (Optional) Add custom domain in Site settings → Domain management
 
 ### Option B: Vercel (Free)
-1. Go to https://vercel.com
-2. Import your project
-3. Deploy
 
-**Note down your production URL** (e.g., `https://coochbeharpolyclinic.com`)
+1. Go to [vercel.com](https://vercel.com)
+2. Import your GitHub repository
+3. Framework Preset: Create React App
+4. Deploy
+
+**📝 Note your production URL** (e.g., `https://copolyz.netlify.app` or `https://copolyz.com`)
 
 ---
 
-## Step 2: Create the Android App using Bubblewrap
+## Step 2: Create Android App with Bubblewrap
 
-### Install Bubblewrap (Google's official TWA tool)
+### 2.1 Install Bubblewrap
+
+Open your terminal and run:
 
 ```bash
-# Install Node.js if not installed
-# Then install Bubblewrap globally
-npm install -g @anthropic/anthropic-sdk -g @anthropic/anthropic-tools
-npm install -g @nicovideo/nicovideo-node
-npm install -g @nicovideo/nicovideo-node
-npm install -g @nicovideo/nicovideo-node
-npm install -g @nicovideo/nicovideo-node
-npm install -g @nicovideo/nicovideo-node
-npm install -g @nicovideo/nicovideo-node
-npm i -g @nicovideo/nicovideo-node
-npm i -g @nicovideo/nicovideo-node
-npm i -g @nicovideo/nicovideo-node
-npm i -g @nicovideo/nicovideo-node
-npm i -g @nicovideo/nicovideo-node
-npm install -g @nicovideo/nicovideo-node
-npm install -g @nicovideo/nicovideo-node
-npm install -g @nicovideo/nicovideo-node
-npm install -g @nicovideo/nicovideo-node
-npm install -g @nicovideo/nicovideo-node
-npm install -g @nicovideo/nicovideo-node
-npm install -g @nicovideo/nicovideo-node
-npm install -g @nicovideo/nicovideo-node
-npm install -g @nicovideo/nicovideo-node
-npm install -g @nicovideo/nicovideo-node
-npm install -g @nicovideo/nicovideo-node
-npm install -g @nicovideo/nicovideo-node
 npm install -g @nicovideo/nicovideo-node
 npm install -g @nicovideo/nicovideo-node
 npm install -g @nicovideo/nicovideo-node
@@ -73,45 +70,53 @@ npm install -g @nicovideo/nicovideo-node
 npm install -g @bubblewrap/cli
 ```
 
-### Initialize the TWA project
+### 2.2 Initialize the TWA Project
 
 ```bash
-mkdir coochbehar-android
-cd coochbehar-android
+# Create project folder
+mkdir copolyz-android
+cd copolyz-android
 
 # Initialize with your production URL
-bubblewrap init --manifest https://YOUR-PRODUCTION-URL.com/manifest.json
+bubblewrap init --manifest https://YOUR-PRODUCTION-URL/manifest.json
 ```
 
-Bubblewrap will ask for:
-- **Application ID**: `com.coochbeharpolyclinic.app`
-- **App name**: `Coochbehar Polyclinic`
-- **Launcher name**: `Polyclinic`
-- **Theme color**: `#2D5A27`
-- **Background color**: `#F7F5F0`
-- **Start URL**: `/`
-- **Icon URL**: Will auto-detect from manifest
+When Bubblewrap prompts you, enter these values:
 
-### Build the APK/AAB
+| Prompt | Value |
+|--------|-------|
+| **Application ID** | `com.copolyz.app` |
+| **App name** | `Copolyz` |
+| **Short name** | `Copolyz` |
+| **Launcher name** | `Copolyz` |
+| **Display mode** | `standalone` |
+| **Theme color** | `#2D5A27` |
+| **Background color** | `#F7F5F0` |
+| **Start URL** | `/` |
+| **Signing key alias** | `copolyz-key` |
+| **Signing key password** | (create a secure password - **save this!**) |
+
+### 2.3 Build the Android App Bundle
 
 ```bash
-# Build the Android App Bundle (required for Play Store)
 bubblewrap build
-
-# This creates:
-# - app-release-bundle.aab (for Play Store)
-# - app-release-signed.apk (for testing)
 ```
+
+This creates two files:
+- `app-release-bundle.aab` → **Upload this to Play Store**
+- `app-release-signed.apk` → For testing on your phone
+
+> 💡 **Testing**: Transfer the `.apk` file to your Android phone and install it to test before uploading to Play Store.
 
 ---
 
-## Step 3: Set Up Digital Asset Links
+## Step 3: Configure Digital Asset Links
 
-After building, Bubblewrap shows your app's SHA-256 fingerprint. You need to add this to your website.
+This step verifies that your website owns the Android app. After building, Bubblewrap shows your app's **SHA-256 fingerprint**.
 
-### Create assetlinks.json
+### 3.1 Create the Asset Links File
 
-Create this file at: `https://YOUR-DOMAIN.com/.well-known/assetlinks.json`
+Create a file at `frontend/public/.well-known/assetlinks.json`:
 
 ```json
 [
@@ -119,16 +124,29 @@ Create this file at: `https://YOUR-DOMAIN.com/.well-known/assetlinks.json`
     "relation": ["delegate_permission/common.handle_all_urls"],
     "target": {
       "namespace": "android_app",
-      "package_name": "com.coochbeharpolyclinic.app",
+      "package_name": "com.copolyz.app",
       "sha256_cert_fingerprints": [
-        "YOUR_SHA256_FINGERPRINT_HERE"
+        "YOUR_SHA256_FINGERPRINT_FROM_BUBBLEWRAP"
       ]
     }
   }
 ]
 ```
 
-For Netlify, create: `/app/frontend/public/.well-known/assetlinks.json`
+### 3.2 Configure Netlify Redirects
+
+If using Netlify, ensure your `frontend/public/_redirects` file includes:
+
+```
+/.well-known/*  /.well-known/:splat  200
+```
+
+### 3.3 Verify Asset Links
+
+After deploying, verify at:
+```
+https://YOUR-DOMAIN/.well-known/assetlinks.json
+```
 
 ---
 
@@ -136,363 +154,177 @@ For Netlify, create: `/app/frontend/public/.well-known/assetlinks.json`
 
 ### 4.1 Create App in Play Console
 
-1. Go to https://play.google.com/console
-2. Click "Create app"
-3. Fill in:
-   - **App name**: Coochbehar Polyclinic
-   - **Default language**: English
-   - **App or game**: App
-   - **Free or paid**: Free
+1. Go to [Google Play Console](https://play.google.com/console)
+2. Click **"Create app"**
+3. Fill in the form:
 
-### 4.2 Set Up Store Listing
+| Field | Value |
+|-------|-------|
+| **App name** | Copolyz |
+| **Default language** | English (India) |
+| **App or game** | App |
+| **Free or paid** | Free |
+| **Declarations** | Check both boxes |
 
-Required information:
-- **Short description** (80 chars): 
-  ```
-  Book appointments with 20+ specialist doctors at Coochbehar Polyclinic
-  ```
-- **Full description** (4000 chars):
-  ```
-  Coochbehar Polyclinic is a multi-specialty healthcare center in Cooch Behar, West Bengal.
-  
-  Features:
-  - Book appointments with 20+ specialist doctors
-  - X-Ray, Blood Test, ECG booking
-  - View doctor profiles and qualifications
-  - Track your appointment status
-  - Bengali language support
-  
-  Specializations available:
-  Medicine, Orthopaedic, Dental, ENT, Dermatology, Surgery, Psychiatry, Paediatrics, Gynaecology, Urology, and more.
-  
-  Working Hours: Monday-Saturday, 10:00 AM - 8:00 PM
-  Location: PVNN Rd, Chaltatala, Cooch Behar, West Bengal 736101
-  Contact: 03582-469726
-  ```
+### 4.2 Complete Store Listing
 
-### 4.3 Upload Screenshots
+Navigate to **Grow** → **Store presence** → **Main store listing**
 
-Required:
-- At least 2 phone screenshots (1080x1920 or similar)
-- Feature graphic (1024x500)
+#### App Details
 
-### 4.4 Upload App Bundle
+**Short description** (80 characters max):
+```
+Book doctor appointments at Coochbehar Polyclinic - 20+ specialists
+```
 
-1. Go to "Release" > "Production"
-2. Click "Create new release"
-3. Upload the `app-release-bundle.aab` file
-4. Add release notes
-5. Review and submit
+**Full description** (4000 characters max):
+```
+Copolyz is the official app of Coochbehar Polyclinic, a premier multi-specialty healthcare center in Cooch Behar, West Bengal.
 
-### 4.5 Complete Content Rating
+📱 KEY FEATURES:
+• Book appointments with 20+ specialist doctors
+• Schedule X-Ray, Blood Tests, ECG online
+• View doctor profiles, qualifications, and availability
+• Track your appointment status
+• Bengali language support
 
-Answer the questionnaire about your app content.
+👨‍⚕️ SPECIALIZATIONS AVAILABLE:
+Medicine, Orthopaedic, Dental, ENT, Dermatology, Surgery, Psychiatry, Paediatrics, Gynaecology, Urology, Cardiology, Neurology, and more.
 
-### 4.6 Set Pricing & Distribution
+🏥 ABOUT COOCHBEHAR POLYCLINIC:
+Serving Cooch Behar for over 25 years with quality healthcare.
 
-- Select "Free"
-- Choose countries (India, or worldwide)
+⏰ Working Hours: Monday-Saturday, 10:00 AM - 8:00 PM
+📍 Location: PVNN Rd, Chaltatala, Cooch Behar, West Bengal 736101
+📞 Contact: 03582-469726
 
----
+Download now and book your appointment in just a few taps!
+```
 
-## Step 5: Wait for Review
+### 4.3 Upload Graphics
 
-Google reviews new apps within 1-7 days. You'll receive an email when approved.
+| Asset | Specifications |
+|-------|---------------|
+| **App icon** | 512 x 512 PNG (already in `public/logo512.png`) |
+| **Feature graphic** | 1024 x 500 PNG |
+| **Phone screenshots** | Minimum 2, size 1080 x 1920 (or similar) |
 
----
+> 💡 Take screenshots of your deployed website on mobile for the phone screenshots.
 
-## Quick Reference: Required Assets
+### 4.4 Create Privacy Policy Page
 
-| Asset | Size | Purpose |
-|-------|------|---------|
-| App Icon | 512x512 PNG | Play Store listing |
-| Feature Graphic | 1024x500 PNG | Play Store banner |
-| Screenshots | 1080x1920 (min 2) | Store listing |
-| Privacy Policy | URL | Required by Google |
-
----
-
-## Privacy Policy
-
-You need a privacy policy URL. Create a simple page on your website at `/privacy-policy` with content like:
+Google requires a privacy policy. Add this page to your app at `/privacy-policy`:
 
 ```
-Privacy Policy for Coochbehar Polyclinic App
+Privacy Policy for Copolyz App
 
-Last updated: [Date]
+Last updated: December 2025
 
-This app collects:
+INFORMATION WE COLLECT:
 - Name and phone number for appointment booking
-- No data is shared with third parties
-- Data is stored securely and used only for appointment management
+- Email address (optional)
 
-Contact: [clinic email/phone]
+HOW WE USE YOUR INFORMATION:
+- To schedule and manage your appointments
+- To send appointment confirmations and reminders
+
+DATA SECURITY:
+- Your data is stored securely and encrypted
+- We do not share your data with third parties
+
+CONTACT US:
+Coochbehar Polyclinic
+PVNN Rd, Chaltatala, Cooch Behar, West Bengal 736101
+Phone: 03582-469726
 ```
+
+Enter the URL in Play Console: `https://YOUR-DOMAIN/privacy-policy`
+
+### 4.5 Upload the App Bundle
+
+1. Go to **Release** → **Production**
+2. Click **"Create new release"**
+3. Upload your `app-release-bundle.aab` file
+4. Add release notes:
+   ```
+   Initial release of Copolyz - Coochbehar Polyclinic appointment booking app.
+   ```
+5. Click **"Review release"** → **"Start rollout to Production"**
+
+### 4.6 Complete Content Rating
+
+1. Go to **Policy** → **App content** → **Content rating**
+2. Start the questionnaire
+3. Answer honestly (medical apps are typically rated "Everyone")
+4. Submit
+
+### 4.7 Set Target Audience and Content
+
+1. Go to **Policy** → **App content** → **Target audience**
+2. Select age groups (18 and older recommended for medical apps)
+3. Answer "No" to questions about children
+
+### 4.8 Review and Submit
+
+1. Check the dashboard for any remaining items
+2. Resolve all issues/warnings
+3. Submit for review
+
+---
+
+## Required Assets Checklist
+
+Before submission, ensure you have:
+
+- [ ] Production website deployed and working
+- [ ] `assetlinks.json` configured and accessible
+- [ ] App icon (512x512) ✅ Already created
+- [ ] Feature graphic (1024x500)
+- [ ] At least 2 phone screenshots
+- [ ] Privacy policy page
+- [ ] `.aab` file built with Bubblewrap
+- [ ] Google Play Developer account ($25)
+
+---
+
+## Timeline
+
+| Stage | Duration |
+|-------|----------|
+| Deploy to production | 30 minutes |
+| Build TWA with Bubblewrap | 30 minutes |
+| Complete Play Store listing | 1-2 hours |
+| Google review | 1-7 days |
+
+---
+
+## Troubleshooting
+
+### "App not found in manifest"
+- Make sure your production URL is correct
+- Verify `manifest.json` is accessible at `https://YOUR-URL/manifest.json`
+
+### "Digital Asset Links validation failed"
+- Check `assetlinks.json` is at `/.well-known/assetlinks.json`
+- Verify the SHA-256 fingerprint matches
+- Wait a few minutes for DNS/CDN to propagate
+
+### "Signing key issues"
+- Keep your signing key password safe - you'll need it for updates
+- If lost, you'll need to create a new app
 
 ---
 
 ## Need Help?
 
-If you get stuck, the key resources are:
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://nicovideo/nicovideo-node
-- Bubblewrap docs: https://nicovideo/nicovideo-node
-- Bubblewrap documentation: https://nicovideo/nicovideo-node
-- Bubblewrap documentation: https://nicovideo/nicovideo-node
-- Bubblewrap documentation: https://nicovideo/nicovideo-node
-- Bubblewrap documentation: https://nicovideo/nicovideo-node
-- Bubblewrap documentation: https://nicovideo/nicovideo-node
-- Bubblewrap documentation: https://nicovideo/nicovideo-node
-- Bubblewrap documentation: https://nicovideo/nicovideo-node
-- Bubblewrap documentation: https://nicovideo/nicovideo-node
-- Bubblewrap documentation: https://nicovideo/nicovideo-node
-- Bubblewrap documentation: https://nicovideo/nicovideo-node
-- Bubblewrap documentation: https://developer.nicovideo/nicovideo-node
-- Bubblewrap documentation: https://developer.nicovideo/nicovideo-node
-- Bubblewrap documentation: https://developer.nicovideo/nicovideo-node
-- Bubblewrap docs: https://nicovideo/nicovideo-node
-- Bubblewrap docs: https://nicovideo/nicovideo-node
-- Bubblewrap docs: https://nicovideo/nicovideo-node
-- Bubblewrap docs: https://nicovideo/nicovideo-node
-- Bubblewrap docs: https://developer.nicovideo/nicovideo-node
-- Bubblewrap docs: https://developer.nicovideo/nicovideo-node
-- Bubblewrap docs: https://developer.nicovideo/nicovideo-node
-- Bubblewrap docs: https://developer.nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap documentation: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap documentation: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap documentation: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap documentation: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap documentation: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap documentation: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap documentation: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap documentation: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap documentation: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap documentation: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap documentation: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap documentation: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap documentation: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap documentation: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap documentation: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap documentation: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap documentation: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap documentation: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap documentation: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap documentation: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap documentation: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap docs: https://github.com/nicovideo/nicovideo-node
-- Bubblewrap documentation: https://github.com/GoogleChromeLabs/bubblewrap
-- Play Console Help: https://support.google.com/googleplay/android-developer
+- **Bubblewrap Documentation**: https://github.com/nicovideo/nicovideo-node
+- **Bubblewrap Documentation**: https://github.com/nicovideo/nicovideo-node
+- **Bubblewrap Documentation**: https://github.com/nicovideo/nicovideo-node
+- **Bubblewrap Documentation**: https://github.com/nicovideo/nicovideo-node
+- **Bubblewrap Documentation**: https://github.com/GoogleChromeLabs/bubblewrap
+- **Play Console Help**: https://support.google.com/googleplay/android-developer
+- **TWA Documentation**: https://developer.chrome.com/docs/android/trusted-web-activity
+
+---
+
+**Congratulations!** Once approved, your **Copolyz** app will be available on the Google Play Store! 🎉

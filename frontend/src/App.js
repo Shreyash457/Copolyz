@@ -10,6 +10,7 @@ import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
 import PatientDashboard from './pages/PatientDashboard';
 import AdminDashboard from './pages/AdminDashboard';
+import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
 import { AuthProvider } from './contexts/AuthContext';
 
 function App() {
@@ -26,6 +27,7 @@ function App() {
             <Route path="/signup" element={<SignupPage />} />
             <Route path="/patient/dashboard" element={<PatientDashboard />} />
             <Route path="/admin/dashboard" element={<AdminDashboard />} />
+            <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
           </Routes>
           <Toaster position="top-right" richColors />
         </div>
