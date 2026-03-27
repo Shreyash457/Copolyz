@@ -30,7 +30,7 @@ export default function LandingPage() {
               <span className="font-semibold text-primary">Coochbehar Polyclinic</span>
             </h1>
             <p className="text-base md:text-lg text-muted-foreground">
-              Quality Healthcare Services / মানসম্মত স্বাস্থ্যসেবা
+              Quality Healthcare Services
             </p>
           </div>
 
