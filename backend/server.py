@@ -531,6 +531,10 @@ async def create_blocked_slot(slot_data: BlockedSlotCreate, current_user: dict =
     doc['created_at'] = doc['created_at'].isoformat()
     
     await db.blocked_slots.insert_one(doc)
+    
+    # Remove MongoDB's _id before returning (it gets added by insert_one)
+    doc.pop('_id', None)
+    
     return {"message": "Time slot blocked successfully", "slot": doc}
 
 
