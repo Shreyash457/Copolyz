@@ -26,6 +26,15 @@ export default function LandingPage() {
       <section className="relative overflow-hidden bg-gradient-to-br from-primary-50 to-secondary-100 py-8 md:py-12">
         <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-24">
           <div className="text-center mb-8">
+            {/* Rotating 3D Logo */}
+            <div className="flex justify-center mb-4">
+              <img 
+                src="/logo512.png" 
+                alt="Copolyz Logo" 
+                className="w-24 h-24 md:w-32 md:h-32 logo-3d-rotate drop-shadow-2xl"
+                data-testid="hero-logo"
+              />
+            </div>
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-light tracking-tight leading-tight mb-3" data-testid="hero-title">
               <span className="font-semibold text-primary">Coochbehar Polyclinic</span>
             </h1>
