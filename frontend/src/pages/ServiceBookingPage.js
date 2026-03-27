@@ -5,7 +5,6 @@ import Navigation from '../components/Navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ArrowLeft, Activity, Droplet, Heart, Clock, CheckCircle } from 'lucide-react';
 import { toast } from 'sonner';
@@ -62,8 +61,7 @@ export default function ServiceBookingPage() {
     patient_name: '',
     patient_phone: '',
     preferred_date: '',
-    preferred_time: '',
-    symptoms: ''
+    preferred_time: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -129,8 +127,7 @@ export default function ServiceBookingPage() {
                     patient_name: '',
                     patient_phone: '',
                     preferred_date: '',
-                    preferred_time: '',
-                    symptoms: ''
+                    preferred_time: ''
                   });
                 }}
                 className="rounded-full px-6"
@@ -246,19 +243,6 @@ export default function ServiceBookingPage() {
                   <Clock className="h-3 w-3" />
                   Clinic hours: 10:00 AM - 8:00 PM (Mon-Sat)
                 </p>
-              </div>
-              
-              <div>
-                <Label htmlFor="symptoms">Additional Notes / অতিরিক্ত তথ্য</Label>
-                <Textarea
-                  id="symptoms"
-                  value={formData.symptoms}
-                  onChange={(e) => setFormData({...formData, symptoms: e.target.value})}
-                  rows={3}
-                  className="rounded-xl mt-2"
-                  placeholder="Any specific requirements or notes (optional) / কোনো নির্দিষ্ট প্রয়োজনীয়তা বা নোট (ঐচ্ছিক)"
-                  data-testid="input-symptoms"
-                />
               </div>
               
               <Button 

@@ -5,7 +5,6 @@ import Navigation from '../components/Navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Calendar, Stethoscope, Award, ArrowLeft, Star, User, Clock } from 'lucide-react';
 import { toast } from 'sonner';
@@ -47,8 +46,7 @@ export default function DoctorDetailPage() {
     patient_phone: user?.phone || '',
     appointment_type: 'New Consultation',
     preferred_date: '',
-    preferred_time: '',
-    symptoms: ''
+    preferred_time: ''
   });
 
   useEffect(() => {
@@ -341,19 +339,6 @@ export default function DoctorDetailPage() {
                     <Clock className="h-3 w-3" />
                     Clinic hours: 10:00 AM - 8:00 PM (Mon-Sat) / ক্লিনিক সময়: সকাল ১০টা - রাত ৮টা (সোম-শনি)
                   </p>
-                </div>
-                
-                <div>
-                  <Label htmlFor="symptoms">Symptoms / Reason for Visit / লক্ষণ বা কারণ</Label>
-                  <Textarea
-                    id="symptoms"
-                    value={formData.symptoms}
-                    onChange={(e) => setFormData({...formData, symptoms: e.target.value})}
-                    rows={4}
-                    className="rounded-xl mt-2"
-                    placeholder="Please describe your symptoms or reason for consultation (optional) / আপনার লক্ষণ বা পরামর্শের কারণ বর্ণনা করুন (ঐচ্ছিক)"
-                    data-testid="input-symptoms"
-                  />
                 </div>
                 
                 <Button 
