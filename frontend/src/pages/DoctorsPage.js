@@ -10,12 +10,33 @@ import StarRating from '../components/StarRating';
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
+// Fixed list of specializations for filter buttons
+const SPECIALIZATION_FILTERS = [
+  'All Doctors',
+  'Physician',
+  'Chest Specialist',
+  'Orthopaedic',
+  'Dental',
+  'ENT Surgeon',
+  'Dermatologist',
+  'General & Laparoscopic Surgeon',
+  'Neuro Psychiatrist',
+  'Paediatrics',
+  'Paediatrician & Neonatologist',
+  'Gynaecologist & Obstetrician',
+  'Urologist',
+  'Rheumatologist',
+  'Oncologist',
+  'Infertility Specialist',
+  'Nutritionist & Dietician'
+];
+
 export default function DoctorsPage() {
   const [doctors, setDoctors] = useState([]);
   const [ratings, setRatings] = useState({});
   const [availability, setAvailability] = useState({});
   const [loading, setLoading] = useState(true);
-  const [selectedSpecialization, setSelectedSpecialization] = useState('all');
+  const [selectedSpecialization, setSelectedSpecialization] = useState('All Doctors');
   const doctorsGridRef = useRef(null);
   
   // Get today's date for availability check
@@ -72,17 +93,35 @@ export default function DoctorsPage() {
     // Smooth scroll to doctors grid with offset
     setTimeout(() => {
       if (doctorsGridRef.current) {
-        const yOffset = -100; // Offset from top
+        const yOffset = -100;
         const y = doctorsGridRef.current.getBoundingClientRect().top + window.pageYOffset + yOffset;
         window.scrollTo({ top: y, behavior: 'smooth' });
       }
     }, 100);
   };
 
-  const specializations = ['all', ...new Set(doctors.map(d => d.specialization))];
-  const filteredDoctors = selectedSpecialization === 'all' 
+  // Filter doctors based on selection
+  const filteredDoctors = selectedSpecialization === 'All Doctors' 
     ? doctors 
-    : doctors.filter(d => d.specialization === selectedSpecialization);
+    : doctors.filter(d => {
+        // Check specialization
+        const specMatch = d.specialization?.toLowerCase().includes(selectedSpecialization.toLowerCase());
+        // Check categories array (for doctors in multiple categories)
+        const catMatch = d.categories?.some(cat => 
+          cat.toLowerCase().includes(selectedSpecialization.toLowerCase())
+        );
+        return specMatch || catMatch;
+      });
+
+  // Get available specializations (only show filters that have doctors)
+  const availableFilters = SPECIALIZATION_FILTERS.filter(spec => {
+    if (spec === 'All Doctors') return true;
+    return doctors.some(d => {
+      const specMatch = d.specialization?.toLowerCase().includes(spec.toLowerCase());
+      const catMatch = d.categories?.some(cat => cat.toLowerCase().includes(spec.toLowerCase()));
+      return specMatch || catMatch;
+    });
+  });
 
   return (
     <div className="min-h-screen">
@@ -99,7 +138,7 @@ export default function DoctorsPage() {
 
           {/* Specialization Filter */}
           <div className="flex flex-wrap gap-3 mb-12 justify-center sticky top-20 z-40 bg-background/95 backdrop-blur-sm py-4 rounded-2xl shadow-sm" data-testid="specialization-filter">
-            {specializations.map((spec) => (
+            {availableFilters.map((spec) => (
               <button
                 key={spec}
                 onClick={() => handleSpecializationClick(spec)}
@@ -108,9 +147,9 @@ export default function DoctorsPage() {
                     ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20 scale-105'
                     : 'bg-white text-foreground border border-border hover:border-primary hover:shadow-md'
                 }`}
-                data-testid={`filter-${spec}`}
+                data-testid={`filter-${spec.replace(/\s+/g, '-').toLowerCase()}`}
               >
-                {spec === 'all' ? 'All Doctors' : spec}
+                {spec}
               </button>
             ))}
           </div>

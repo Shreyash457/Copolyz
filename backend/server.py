@@ -82,6 +82,7 @@ class Doctor(BaseModel):
     available_days: List[str] = []
     accepts_online_booking: bool = True
     max_daily_appointments: Optional[int] = None  # None means unlimited
+    categories: Optional[List[str]] = None  # For doctors in multiple categories
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 class BlockedSlot(BaseModel):
