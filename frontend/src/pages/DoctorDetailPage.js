@@ -10,20 +10,9 @@ import { Calendar, Stethoscope, Award, ArrowLeft, Star, User, Clock } from 'luci
 import { toast } from 'sonner';
 import { useAuth } from '../contexts/AuthContext';
 import StarRating from '../components/StarRating';
-import { APPOINTMENT_TYPES_INFO, AppointmentTypeCard } from '../components/AppointmentTypes';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
-
-const APPOINTMENT_TYPES = [
-  'New Consultation',
-  'Blood Test',
-  'ECG',
-  'X-Ray',
-  'Injection',
-  'Dressing',
-  'Medicine'
-];
 
 const TIME_SLOTS = [
   '10:00 AM', '10:30 AM', '11:00 AM', '11:30 AM',
@@ -44,7 +33,6 @@ export default function DoctorDetailPage() {
   const [formData, setFormData] = useState({
     patient_name: user?.name || '',
     patient_phone: user?.phone || '',
-    appointment_type: 'New Consultation',
     preferred_date: '',
     preferred_time: ''
   });
@@ -101,7 +89,8 @@ export default function DoctorDetailPage() {
       const appointmentData = {
         ...formData,
         doctor_id: doctor.id,
-        patient_id: user?.id || null
+        patient_id: user?.id || null,
+        appointment_type: 'New Consultation'
       };
       
       await axios.post(`${API}/appointments`, appointmentData);
@@ -272,38 +261,6 @@ export default function DoctorDetailPage() {
                     placeholder="10-digit mobile number / ১০ সংখ্যার মোবাইল নম্বর"
                     data-testid="input-phone"
                   />
-                </div>
-                
-                <div>
-                  <Label htmlFor="appointment_type">Appointment Type / অ্যাপয়েন্টমেন্ট ধরন *</Label>
-                  <Select
-                    value={formData.appointment_type}
-                    onValueChange={(value) => setFormData({...formData, appointment_type: value})}
-                  >
-                    <SelectTrigger className="rounded-xl mt-2" data-testid="input-appointment-type">
-                      <SelectValue placeholder="Select appointment type / ধরন নির্বাচন করুন" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {APPOINTMENT_TYPES.map((type) => {
-                        const info = APPOINTMENT_TYPES_INFO[type];
-                        return (
-                          <SelectItem key={type} value={type}>
-                            {info ? `${info.english} / ${info.bengali}` : type}
-                          </SelectItem>
-                        );
-                      })}
-                    </SelectContent>
-                  </Select>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Duration: 10-15 minutes / সময়কাল: ১০-১৫ মিনিট
-                  </p>
-                  
-                  {/* Show appointment type details */}
-                  {formData.appointment_type && (
-                    <div className="mt-3">
-                      <AppointmentTypeCard type={formData.appointment_type} />
-                    </div>
-                  )}
                 </div>
                 
                 <div>
