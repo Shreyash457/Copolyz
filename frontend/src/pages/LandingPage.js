@@ -170,15 +170,15 @@ export default function LandingPage() {
             {specializations.map((spec, index) => {
               const Icon = spec.icon;
               return (
-                <Link 
+                <a 
                   key={index}
-                  to={`/category/${encodeURIComponent(spec.name)}`}
-                  className="bg-white rounded-2xl p-5 border border-border/40 hover:shadow-xl hover:-translate-y-1 hover:border-[#2D5A27]/30 transition-all duration-300 cursor-pointer group block"
+                  href={`/category/${encodeURIComponent(spec.name)}`}
+                  className="bg-white rounded-2xl p-5 border border-border/40 hover:shadow-xl hover:-translate-y-1 hover:border-[#2D5A27]/30 transition-all duration-300 cursor-pointer group block no-underline"
                   data-testid={`specialization-${spec.name.toLowerCase().replace(/\s+/g, '-')}`}
                 >
                   <Icon className="h-7 w-7 text-primary mb-2 group-hover:scale-110 transition-transform" />
-                  <h3 className="font-medium text-sm leading-tight">{spec.name}</h3>
-                </Link>
+                  <h3 className="font-medium text-sm leading-tight text-foreground">{spec.name}</h3>
+                </a>
               );
             })}
           </div>
