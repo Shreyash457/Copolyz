@@ -6,6 +6,7 @@ import LandingPage from './pages/LandingPage';
 import DoctorsPage from './pages/DoctorsPage';
 import DoctorDetailPage from './pages/DoctorDetailPage';
 import ServiceBookingPage from './pages/ServiceBookingPage';
+import CategoryDoctorsPage from './pages/CategoryDoctorsPage';
 import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
 import PatientDashboard from './pages/PatientDashboard';
@@ -22,6 +23,7 @@ function App() {
             <Route path="/" element={<LandingPage />} />
             <Route path="/doctors" element={<DoctorsPage />} />
             <Route path="/doctors/:id" element={<DoctorDetailPage />} />
+            <Route path="/category/:category" element={<CategoryDoctorsPage />} />
             <Route path="/book" element={<ServiceBookingPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignupPage />} />

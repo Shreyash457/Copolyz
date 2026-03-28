@@ -1,22 +1,33 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Phone, MapPin, Clock, Stethoscope, Heart, Users, Award, Activity, Droplet } from 'lucide-react';
+import { Phone, MapPin, Clock, Stethoscope, Heart, Users, Award, Activity, Droplet, Bone, Eye, Brain, Baby, UserCheck } from 'lucide-react';
 import Navigation from '../components/Navigation';
 
 export default function LandingPage() {
+  const navigate = useNavigate();
+  
   const specializations = [
-    { name: 'Medicine', icon: Stethoscope },
-    { name: 'Orthopaedic', icon: Heart },
+    { name: 'Physician', icon: Stethoscope },
+    { name: 'Chest Specialist', icon: Activity },
+    { name: 'Orthopaedic', icon: Bone },
     { name: 'Dental', icon: Users },
     { name: 'ENT', icon: Award },
-    { name: 'Dermatology', icon: Heart },
-    { name: 'Surgery', icon: Stethoscope },
-    { name: 'Psychiatry', icon: Users },
-    { name: 'Paediatrics', icon: Heart },
-    { name: 'Gynaecology', icon: Award },
-    { name: 'Urology', icon: Stethoscope }
+    { name: 'Dermatologist', icon: Heart },
+    { name: 'General & Laparoscopic Surgeon', icon: Stethoscope },
+    { name: 'Neuro Psychiatrist', icon: Brain },
+    { name: 'Paediatrics', icon: Baby },
+    { name: 'Gynaecologist', icon: UserCheck },
+    { name: 'Urologist', icon: Droplet },
+    { name: 'Rheumatologist', icon: Bone },
+    { name: 'Oncologist', icon: Heart },
+    { name: 'Infertility Specialist', icon: Heart },
+    { name: 'Nutritionist', icon: Award }
   ];
+
+  const handleCategoryClick = (categoryName) => {
+    navigate(`/category/${encodeURIComponent(categoryName)}`);
+  };
 
   return (
     <div className="min-h-screen">
@@ -161,17 +172,18 @@ export default function LandingPage() {
             </p>
           </div>
           
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
             {specializations.map((spec, index) => {
               const Icon = spec.icon;
               return (
                 <div 
                   key={index}
-                  className="bg-white rounded-2xl p-6 border border-border/40 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer group"
-                  data-testid={`specialization-${spec.name.toLowerCase()}`}
+                  onClick={() => handleCategoryClick(spec.name)}
+                  className="bg-white rounded-2xl p-5 border border-border/40 hover:shadow-xl hover:-translate-y-1 hover:border-[#2D5A27]/30 transition-all duration-300 cursor-pointer group"
+                  data-testid={`specialization-${spec.name.toLowerCase().replace(/\s+/g, '-')}`}
                 >
-                  <Icon className="h-8 w-8 text-primary mb-3 group-hover:scale-110 transition-transform" />
-                  <h3 className="font-medium text-sm">{spec.name}</h3>
+                  <Icon className="h-7 w-7 text-primary mb-2 group-hover:scale-110 transition-transform" />
+                  <h3 className="font-medium text-sm leading-tight">{spec.name}</h3>
                 </div>
               );
             })}
