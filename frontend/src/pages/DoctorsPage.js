@@ -88,16 +88,20 @@ export default function DoctorsPage() {
   };
 
   const handleSpecializationClick = (spec) => {
-    setSelectedSpecialization(spec);
-    
-    // Smooth scroll to doctors grid with offset
-    setTimeout(() => {
-      if (doctorsGridRef.current) {
-        const yOffset = -100;
-        const y = doctorsGridRef.current.getBoundingClientRect().top + window.pageYOffset + yOffset;
-        window.scrollTo({ top: y, behavior: 'smooth' });
-      }
-    }, 100);
+    if (spec === 'All Doctors') {
+      setSelectedSpecialization(spec);
+      // Scroll to doctors grid
+      setTimeout(() => {
+        if (doctorsGridRef.current) {
+          const yOffset = -100;
+          const y = doctorsGridRef.current.getBoundingClientRect().top + window.pageYOffset + yOffset;
+          window.scrollTo({ top: y, behavior: 'smooth' });
+        }
+      }, 100);
+    } else {
+      // Navigate to category page
+      window.location.href = `/category/${encodeURIComponent(spec)}`;
+    }
   };
 
   // Filter doctors based on selection
@@ -136,22 +140,24 @@ export default function DoctorsPage() {
             <p className="text-lg text-muted-foreground">Meet our team of experienced healthcare professionals</p>
           </div>
 
-          {/* Specialization Filter */}
-          <div className="flex flex-wrap gap-3 mb-12 justify-center sticky top-20 z-40 bg-background/95 backdrop-blur-sm py-4 rounded-2xl shadow-sm" data-testid="specialization-filter">
-            {availableFilters.map((spec) => (
-              <button
-                key={spec}
-                onClick={() => handleSpecializationClick(spec)}
-                className={`px-6 py-2 rounded-full text-sm font-medium transition-all duration-300 transform hover:scale-105 ${
-                  selectedSpecialization === spec
-                    ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20 scale-105'
-                    : 'bg-white text-foreground border border-border hover:border-primary hover:shadow-md'
-                }`}
-                data-testid={`filter-${spec.replace(/\s+/g, '-').toLowerCase()}`}
-              >
-                {spec}
-              </button>
-            ))}
+          {/* Specialization Filter - Horizontal Scroll */}
+          <div className="mb-6 -mx-4 px-4">
+            <div className="flex gap-2 overflow-x-auto pb-3 scrollbar-hide" style={{scrollbarWidth: 'none', msOverflowStyle: 'none'}} data-testid="specialization-filter">
+              {availableFilters.map((spec) => (
+                <button
+                  key={spec}
+                  onClick={() => handleSpecializationClick(spec)}
+                  className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all flex-shrink-0 ${
+                    selectedSpecialization === spec
+                      ? 'bg-primary text-primary-foreground shadow-md'
+                      : 'bg-white text-foreground border border-border hover:border-primary'
+                  }`}
+                  data-testid={`filter-${spec.replace(/\s+/g, '-').toLowerCase()}`}
+                >
+                  {spec}
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* Doctors Grid */}
