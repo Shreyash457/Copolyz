@@ -134,11 +134,11 @@ export default function DoctorDetailPage() {
     <div className="min-h-screen">
       <Navigation />
       
-      <div className="px-6 md:px-12 lg:px-24 py-20">
+      <div className="px-4 md:px-8 lg:px-24 py-8 md:py-12">
         <div className="max-w-6xl mx-auto">
           <Button 
             variant="ghost" 
-            className="mb-8 rounded-full" 
+            className="mb-6 rounded-full" 
             onClick={() => navigate('/doctors')}
             data-testid="back-to-doctors"
           >
@@ -146,17 +146,17 @@ export default function DoctorDetailPage() {
             Back to Doctors
           </Button>
 
-          <div className="grid lg:grid-cols-2 gap-12">
+          <div className="grid lg:grid-cols-2 gap-8">
             {/* Doctor Info */}
             <div>
-              <div className="bg-white rounded-3xl p-10 border border-border/40 mb-6">
-                <div className="flex items-center justify-center bg-primary/10 w-24 h-24 rounded-full mb-6 mx-auto">
-                  <Stethoscope className="h-12 w-12 text-primary" />
+              <div className="bg-white rounded-3xl p-6 md:p-8 border border-border/40 mb-6">
+                <div className="flex items-center justify-center bg-primary/10 w-20 h-20 rounded-full mb-4 mx-auto">
+                  <Stethoscope className="h-10 w-10 text-primary" />
                 </div>
                 
                 <div className="text-center">
-                  <h1 className="text-3xl font-semibold mb-2" data-testid="doctor-detail-name">{doctor.name}</h1>
-                  <p className="text-lg text-primary font-medium mb-4" data-testid="doctor-detail-spec">{doctor.specialization}</p>
+                  <h1 className="text-xl md:text-2xl font-semibold mb-2 break-words" data-testid="doctor-detail-name">{doctor.name}</h1>
+                  <p className="text-base text-primary font-medium mb-4" data-testid="doctor-detail-spec">{doctor.specialization}</p>
                   
                   {rating.total_reviews > 0 && (
                     <div className="flex justify-center mb-4">
@@ -170,20 +170,20 @@ export default function DoctorDetailPage() {
                 </div>
               </div>
               
-              <div className="bg-white rounded-2xl p-8 border border-border/40 mb-6">
-                <div className="flex items-start gap-3 mb-6">
+              <div className="bg-white rounded-2xl p-6 border border-border/40 mb-6">
+                <div className="flex items-start gap-3 mb-4">
                   <Award className="h-5 w-5 text-primary flex-shrink-0 mt-1" />
-                  <div>
+                  <div className="min-w-0 flex-1">
                     <h3 className="font-medium mb-1">Qualifications</h3>
-                    <p className="text-sm text-muted-foreground" data-testid="doctor-detail-qual">{doctor.qualifications}</p>
+                    <p className="text-sm text-muted-foreground break-words" data-testid="doctor-detail-qual">{doctor.qualifications}</p>
                   </div>
                 </div>
                 
                 <div className="flex items-start gap-3">
                   <Calendar className="h-5 w-5 text-primary flex-shrink-0 mt-1" />
-                  <div>
+                  <div className="min-w-0 flex-1">
                     <h3 className="font-medium mb-1">Available Days</h3>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-sm text-muted-foreground break-words">
                       {doctor.available_days?.join(', ') || 'Monday - Saturday'}
                     </p>
                     <p className="text-sm text-muted-foreground mt-1">10:00 AM - 8:00 PM</p>
@@ -193,9 +193,9 @@ export default function DoctorDetailPage() {
 
               {/* Reviews Section */}
               {reviews.length > 0 && (
-                <div className="bg-white rounded-2xl p-8 border border-border/40">
-                  <h3 className="text-xl font-semibold mb-6">Patient Reviews</h3>
-                  <div className="space-y-4 max-h-96 overflow-y-auto">
+                <div className="bg-white rounded-2xl p-6 border border-border/40">
+                  <h3 className="text-lg font-semibold mb-4">Patient Reviews</h3>
+                  <div className="space-y-4 max-h-60 overflow-y-auto">
                     {reviews.map((review) => (
                       <div key={review.id} className="border-b border-border/40 pb-4 last:border-0" data-testid={`review-${review.id}`}>
                         <div className="flex items-start justify-between mb-2">
@@ -228,15 +228,15 @@ export default function DoctorDetailPage() {
             </div>
 
             {/* Appointment Form */}
-            <div className="bg-white rounded-2xl p-8 border border-border/40">
-              <h2 className="text-2xl font-semibold mb-4" data-testid="appointment-form-title">
-                Request Appointment / অ্যাপয়েন্টমেন্টের অনুরোধ
+            <div className="bg-white rounded-2xl p-6 border border-border/40 h-fit">
+              <h2 className="text-xl font-semibold mb-3" data-testid="appointment-form-title">
+                Request Appointment
               </h2>
-              <p className="text-sm text-muted-foreground mb-6">
-                Fill the form below to book your appointment / নিচের ফর্মটি পূরণ করুন
+              <p className="text-sm text-muted-foreground mb-4">
+                অ্যাপয়েন্টমেন্টের জন্য নিচের ফর্মটি পূরণ করুন
               </p>
               
-              <form onSubmit={handleSubmit} className="space-y-6">
+              <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
                   <Label htmlFor="patient_name">Full Name / পুরো নাম *</Label>
                   <Input
@@ -244,8 +244,8 @@ export default function DoctorDetailPage() {
                     value={formData.patient_name}
                     onChange={(e) => setFormData({...formData, patient_name: e.target.value})}
                     required
-                    className="rounded-xl mt-2"
-                    placeholder="Enter your full name / আপনার পুরো নাম লিখুন"
+                    className="rounded-xl mt-1"
+                    placeholder="আপনার পুরো নাম লিখুন"
                     data-testid="input-name"
                   />
                 </div>
@@ -257,8 +257,8 @@ export default function DoctorDetailPage() {
                     value={formData.patient_phone}
                     onChange={(e) => setFormData({...formData, patient_phone: e.target.value})}
                     required
-                    className="rounded-xl mt-2"
-                    placeholder="10-digit mobile number / ১০ সংখ্যার মোবাইল নম্বর"
+                    className="rounded-xl mt-1"
+                    placeholder="১০ সংখ্যার মোবাইল নম্বর"
                     data-testid="input-phone"
                   />
                 </div>
@@ -272,7 +272,7 @@ export default function DoctorDetailPage() {
                     onChange={(e) => setFormData({...formData, preferred_date: e.target.value})}
                     required
                     min={new Date().toISOString().split('T')[0]}
-                    className="rounded-xl mt-2"
+                    className="rounded-xl mt-1"
                     data-testid="input-date"
                   />
                 </div>
