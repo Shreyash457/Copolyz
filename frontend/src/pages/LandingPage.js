@@ -14,7 +14,7 @@ export default function LandingPage() {
     { name: 'Dermatologist', icon: Heart },
     { name: 'General & Laparoscopic Surgeon', icon: Stethoscope },
     { name: 'Neuro Psychiatrist', icon: Brain },
-    { name: 'Paediatrics', icon: Baby },
+    { name: 'Child Specialist', icon: Baby },
     { name: 'Gynaecologist', icon: UserCheck },
     { name: 'Urologist', icon: Droplet },
     { name: 'Rheumatologist', icon: Bone },
