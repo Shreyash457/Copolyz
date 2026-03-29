@@ -140,14 +140,14 @@ export default function DoctorsPage() {
             <p className="text-lg text-muted-foreground">Meet our team of experienced healthcare professionals</p>
           </div>
 
-          {/* Specialization Filter - Horizontal Scroll */}
-          <div className="mb-6 -mx-4 px-4">
-            <div className="flex gap-2 overflow-x-auto pb-3 scrollbar-hide" style={{scrollbarWidth: 'none', msOverflowStyle: 'none'}} data-testid="specialization-filter">
+          {/* Specialization Filter - All visible */}
+          <div className="mb-6" data-testid="specialization-filter">
+            <div className="flex flex-wrap gap-2 justify-center">
               {availableFilters.map((spec) => (
                 <button
                   key={spec}
                   onClick={() => handleSpecializationClick(spec)}
-                  className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all flex-shrink-0 ${
+                  className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
                     selectedSpecialization === spec
                       ? 'bg-primary text-primary-foreground shadow-md'
                       : 'bg-white text-foreground border border-border hover:border-primary'
