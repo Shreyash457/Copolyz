@@ -131,14 +131,14 @@ export default function DoctorDetailPage() {
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen overflow-x-hidden">
       <Navigation />
       
-      <div className="px-4 md:px-8 lg:px-24 py-8 md:py-12">
-        <div className="max-w-6xl mx-auto">
+      <div className="px-4 py-6 w-full max-w-full">
+        <div className="max-w-2xl mx-auto">
           <Button 
             variant="ghost" 
-            className="mb-6 rounded-full" 
+            className="mb-4 rounded-full" 
             onClick={() => navigate('/doctors')}
             data-testid="back-to-doctors"
           >
@@ -146,174 +146,166 @@ export default function DoctorDetailPage() {
             Back to Doctors
           </Button>
 
-          <div className="grid lg:grid-cols-2 gap-8">
-            {/* Doctor Info */}
-            <div>
-              <div className="bg-white rounded-3xl p-6 md:p-8 border border-border/40 mb-6">
-                <div className="flex items-center justify-center bg-primary/10 w-20 h-20 rounded-full mb-4 mx-auto">
-                  <Stethoscope className="h-10 w-10 text-primary" />
-                </div>
-                
-                <div className="text-center">
-                  <h1 className="text-xl md:text-2xl font-semibold mb-2 break-words" data-testid="doctor-detail-name">{doctor.name}</h1>
-                  <p className="text-base text-primary font-medium mb-4" data-testid="doctor-detail-spec">{doctor.specialization}</p>
-                  
-                  {rating.total_reviews > 0 && (
-                    <div className="flex justify-center mb-4">
-                      <StarRating 
-                        rating={rating.average_rating} 
-                        totalReviews={rating.total_reviews}
-                        size="md"
-                      />
-                    </div>
-                  )}
-                </div>
-              </div>
+          {/* Doctor Info */}
+          <div className="bg-white rounded-2xl p-5 border border-border/40 mb-4">
+            <div className="flex items-center justify-center bg-primary/10 w-16 h-16 rounded-full mb-3 mx-auto">
+              <Stethoscope className="h-8 w-8 text-primary" />
+            </div>
+            
+            <div className="text-center">
+              <h1 className="text-lg font-semibold mb-1" data-testid="doctor-detail-name">{doctor.name}</h1>
+              <p className="text-sm text-primary font-medium mb-3" data-testid="doctor-detail-spec">{doctor.specialization}</p>
               
-              <div className="bg-white rounded-2xl p-6 border border-border/40 mb-6">
-                <div className="flex items-start gap-3 mb-4">
-                  <Award className="h-5 w-5 text-primary flex-shrink-0 mt-1" />
-                  <div className="min-w-0 flex-1">
-                    <h3 className="font-medium mb-1">Qualifications</h3>
-                    <p className="text-sm text-muted-foreground break-words" data-testid="doctor-detail-qual">{doctor.qualifications}</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start gap-3">
-                  <Calendar className="h-5 w-5 text-primary flex-shrink-0 mt-1" />
-                  <div className="min-w-0 flex-1">
-                    <h3 className="font-medium mb-1">Available Days</h3>
-                    <p className="text-sm text-muted-foreground break-words">
-                      {doctor.available_days?.join(', ') || 'Monday - Saturday'}
-                    </p>
-                    <p className="text-sm text-muted-foreground mt-1">10:00 AM - 8:00 PM</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Reviews Section */}
-              {reviews.length > 0 && (
-                <div className="bg-white rounded-2xl p-6 border border-border/40">
-                  <h3 className="text-lg font-semibold mb-4">Patient Reviews</h3>
-                  <div className="space-y-4 max-h-60 overflow-y-auto">
-                    {reviews.map((review) => (
-                      <div key={review.id} className="border-b border-border/40 pb-4 last:border-0" data-testid={`review-${review.id}`}>
-                        <div className="flex items-start justify-between mb-2">
-                          <div className="flex items-center gap-2">
-                            <div className="bg-primary/10 p-2 rounded-full">
-                              <User className="h-4 w-4 text-primary" />
-                            </div>
-                            <div>
-                              <p className="font-medium text-sm">{review.patient_name}</p>
-                              <div className="flex items-center gap-1 mt-1">
-                                {[...Array(5)].map((_, i) => (
-                                  <Star 
-                                    key={i} 
-                                    className={`h-3 w-3 ${i < review.rating ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'}`}
-                                  />
-                                ))}
-                              </div>
-                            </div>
-                          </div>
-                          <span className="text-xs text-muted-foreground">
-                            {new Date(review.created_at).toLocaleDateString()}
-                          </span>
-                        </div>
-                        <p className="text-sm text-muted-foreground ml-10">{review.comment}</p>
-                      </div>
-                    ))}
-                  </div>
+              {rating.total_reviews > 0 && (
+                <div className="flex justify-center mb-2">
+                  <StarRating 
+                    rating={rating.average_rating} 
+                    totalReviews={rating.total_reviews}
+                    size="sm"
+                  />
                 </div>
               )}
             </div>
-
-            {/* Appointment Form */}
-            <div className="bg-white rounded-2xl p-6 border border-border/40 h-fit">
-              <h2 className="text-xl font-semibold mb-3" data-testid="appointment-form-title">
-                Request Appointment
-              </h2>
-              <p className="text-sm text-muted-foreground mb-4">
-                অ্যাপয়েন্টমেন্টের জন্য নিচের ফর্মটি পূরণ করুন
-              </p>
-              
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div>
-                  <Label htmlFor="patient_name">Full Name / পুরো নাম *</Label>
-                  <Input
-                    id="patient_name"
-                    value={formData.patient_name}
-                    onChange={(e) => setFormData({...formData, patient_name: e.target.value})}
-                    required
-                    className="rounded-xl mt-1"
-                    placeholder="আপনার পুরো নাম লিখুন"
-                    data-testid="input-name"
-                  />
-                </div>
-                
-                <div>
-                  <Label htmlFor="patient_phone">Phone Number / ফোন নম্বর *</Label>
-                  <Input
-                    id="patient_phone"
-                    value={formData.patient_phone}
-                    onChange={(e) => setFormData({...formData, patient_phone: e.target.value})}
-                    required
-                    className="rounded-xl mt-1"
-                    placeholder="১০ সংখ্যার মোবাইল নম্বর"
-                    data-testid="input-phone"
-                  />
-                </div>
-                
-                <div>
-                  <Label htmlFor="preferred_date">Preferred Date / পছন্দের তারিখ *</Label>
-                  <Input
-                    id="preferred_date"
-                    type="date"
-                    value={formData.preferred_date}
-                    onChange={(e) => setFormData({...formData, preferred_date: e.target.value})}
-                    required
-                    min={new Date().toISOString().split('T')[0]}
-                    className="rounded-xl mt-1"
-                    data-testid="input-date"
-                  />
-                </div>
-                
-                <div>
-                  <Label htmlFor="preferred_time">Preferred Time / পছন্দের সময় *</Label>
-                  <Select
-                    value={formData.preferred_time}
-                    onValueChange={(value) => setFormData({...formData, preferred_time: value})}
-                  >
-                    <SelectTrigger className="rounded-xl mt-2" data-testid="input-time">
-                      <SelectValue placeholder="Select time slot / সময় নির্বাচন করুন" />
-                    </SelectTrigger>
-                    <SelectContent className="max-h-60">
-                      {TIME_SLOTS.map((time) => (
-                        <SelectItem key={time} value={time}>{time}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
-                    <Clock className="h-3 w-3" />
-                    Clinic hours: 10:00 AM - 8:00 PM (Mon-Sat) / ক্লিনিক সময়: সকাল ১০টা - রাত ৮টা (সোম-শনি)
-                  </p>
-                </div>
-                
-                <Button 
-                  type="submit" 
-                  size="lg" 
-                  className="w-full rounded-full"
-                  data-testid="submit-appointment-btn"
-                >
-                  Submit Appointment Request / অ্যাপয়েন্টমেন্ট জমা দিন
-                </Button>
-                
-                <p className="text-sm text-muted-foreground text-center">
-                  Your appointment will be reviewed and confirmed by our team
-                  <br />
-                  <span className="text-xs">আপনার অ্যাপয়েন্টমেন্ট আমাদের টিম দ্বারা পর্যালোচনা এবং নিশ্চিত করা হবে</span>
-                </p>
-              </form>
+          </div>
+          
+          <div className="bg-white rounded-xl p-4 border border-border/40 mb-4">
+            <div className="flex items-start gap-3 mb-3">
+              <Award className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
+              <div className="min-w-0 flex-1">
+                <h3 className="font-medium text-sm mb-1">Qualifications</h3>
+                <p className="text-xs text-muted-foreground" data-testid="doctor-detail-qual">{doctor.qualifications}</p>
+              </div>
             </div>
+            
+            <div className="flex items-start gap-3">
+              <Calendar className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
+              <div className="min-w-0 flex-1">
+                <h3 className="font-medium text-sm mb-1">Available Days</h3>
+                <p className="text-xs text-muted-foreground">
+                  Mon - Sat, 10:00 AM - 8:00 PM
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Reviews Section */}
+          {reviews.length > 0 && (
+            <div className="bg-white rounded-xl p-4 border border-border/40 mb-4">
+              <h3 className="text-sm font-semibold mb-3">Patient Reviews</h3>
+              <div className="space-y-3 max-h-40 overflow-y-auto">
+                {reviews.map((review) => (
+                  <div key={review.id} className="border-b border-border/40 pb-3 last:border-0" data-testid={`review-${review.id}`}>
+                    <div className="flex items-start justify-between mb-1">
+                      <div className="flex items-center gap-2">
+                        <div className="bg-primary/10 p-1.5 rounded-full">
+                          <User className="h-3 w-3 text-primary" />
+                        </div>
+                        <div>
+                          <p className="font-medium text-xs">{review.patient_name}</p>
+                          <div className="flex items-center gap-0.5 mt-0.5">
+                            {[...Array(5)].map((_, i) => (
+                              <Star 
+                                key={i} 
+                                className={`h-2.5 w-2.5 ${i < review.rating ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'}`}
+                              />
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                      <span className="text-xs text-muted-foreground">
+                        {new Date(review.created_at).toLocaleDateString()}
+                      </span>
+                    </div>
+                    <p className="text-xs text-muted-foreground ml-8">{review.comment}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Appointment Form */}
+          <div className="bg-white rounded-xl p-4 border border-border/40">
+            <h2 className="text-base font-semibold mb-2" data-testid="appointment-form-title">
+              Request Appointment
+            </h2>
+            <p className="text-xs text-muted-foreground mb-4">
+              অ্যাপয়েন্টমেন্টের জন্য ফর্মটি পূরণ করুন
+            </p>
+            
+            <form onSubmit={handleSubmit} className="space-y-3">
+              <div>
+                <Label htmlFor="patient_name" className="text-sm">Full Name / পুরো নাম *</Label>
+                <Input
+                  id="patient_name"
+                  value={formData.patient_name}
+                  onChange={(e) => setFormData({...formData, patient_name: e.target.value})}
+                  required
+                  className="rounded-lg mt-1 h-9 text-sm"
+                  placeholder="আপনার পুরো নাম"
+                  data-testid="input-name"
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="patient_phone" className="text-sm">Phone / ফোন নম্বর *</Label>
+                <Input
+                  id="patient_phone"
+                  value={formData.patient_phone}
+                  onChange={(e) => setFormData({...formData, patient_phone: e.target.value})}
+                  required
+                  className="rounded-lg mt-1 h-9 text-sm"
+                  placeholder="মোবাইল নম্বর"
+                  data-testid="input-phone"
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="preferred_date" className="text-sm">Date / তারিখ *</Label>
+                <Input
+                  id="preferred_date"
+                  type="date"
+                  value={formData.preferred_date}
+                  onChange={(e) => setFormData({...formData, preferred_date: e.target.value})}
+                  required
+                  min={new Date().toISOString().split('T')[0]}
+                  className="rounded-lg mt-1 h-9 text-sm"
+                  data-testid="input-date"
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="preferred_time" className="text-sm">Time / সময় *</Label>
+                <Select
+                  value={formData.preferred_time}
+                  onValueChange={(value) => setFormData({...formData, preferred_time: value})}
+                >
+                  <SelectTrigger className="rounded-lg mt-1 h-9 text-sm" data-testid="input-time">
+                    <SelectValue placeholder="সময় নির্বাচন করুন" />
+                  </SelectTrigger>
+                  <SelectContent className="max-h-48">
+                    {TIME_SLOTS.map((time) => (
+                      <SelectItem key={time} value={time}>{time}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
+                  <Clock className="h-3 w-3" />
+                  ক্লিনিক সময়: সকাল ১০টা - রাত ৮টা
+                </p>
+              </div>
+              
+              <Button
+                type="submit"
+                className="w-full rounded-lg bg-black hover:bg-gray-800 text-white font-bold h-10 mt-2"
+                data-testid="submit-appointment"
+              >
+                Book Appointment
+              </Button>
+              
+              <p className="text-xs text-center text-muted-foreground">
+                Our staff will confirm your appointment
+              </p>
+            </form>
           </div>
         </div>
       </div>
