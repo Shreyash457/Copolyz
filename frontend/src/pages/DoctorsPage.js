@@ -146,10 +146,10 @@ export default function DoctorsPage() {
                 <button
                   key={spec}
                   onClick={() => handleSpecializationClick(spec)}
-                  className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
+                  className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all shadow-sm ${
                     selectedSpecialization === spec
-                      ? 'bg-primary text-primary-foreground shadow-md'
-                      : 'bg-white text-foreground border border-border hover:border-primary'
+                      ? 'bg-gradient-to-r from-[#2D5A27] to-[#4a7c43] text-white shadow-lg scale-105'
+                      : 'bg-gradient-to-r from-orange-400 to-orange-500 text-white hover:from-orange-500 hover:to-orange-600 hover:shadow-md'
                   }`}
                   data-testid={`filter-${spec.replace(/\s+/g, '-').toLowerCase()}`}
                 >
@@ -216,10 +216,10 @@ export default function DoctorsPage() {
                         )}
                         
                         <Button 
-                          className={`w-full rounded-full group-hover:scale-105 transition-transform duration-300 ${isFullyBooked ? 'bg-gray-400 hover:bg-gray-500' : ''}`}
+                          className={`w-full rounded-full group-hover:scale-105 transition-transform duration-300 text-base font-bold tracking-wide shadow-lg ${isFullyBooked ? 'bg-gray-400 hover:bg-gray-500' : 'bg-gradient-to-r from-[#FF6B35] to-[#F7931E] hover:from-[#FF5722] hover:to-[#FF6B35] text-white shadow-orange-300'}`}
                           data-testid={`book-btn-${doctor.id}`}
                         >
-                          {isFullyBooked ? 'View Details' : 'Book Appointment'}
+                          {isFullyBooked ? 'View Details' : '📅 Book Appointment'}
                         </Button>
                       </div>
                     </div>
