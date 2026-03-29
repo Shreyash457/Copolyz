@@ -5,7 +5,8 @@ import Navigation from '../components/Navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Calendar, Clock, User, CheckCircle, XCircle, FileText, Lock, Unlock, Plus, Trash2, Key, Eye, EyeOff } from 'lucide-react';
+import { Label } from '@/components/ui/label';
+import { Calendar, Clock, User, CheckCircle, XCircle, FileText, Lock, Unlock, Plus, Trash2, Key, Eye, EyeOff, UserPlus, Stethoscope, Edit, Users } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuth } from '../contexts/AuthContext';
 import {
@@ -41,6 +42,14 @@ const STATUS_COLORS = {
   cancelled: 'bg-gray-100 text-gray-800 border-gray-200'
 };
 
+const SPECIALIZATIONS = [
+  'Physician', 'Chest Specialist', 'Orthopaedic', 'Dental', 'ENT Surgeon',
+  'Dermatologist', 'General & Laparoscopic Surgeon', 'Neuro Psychiatrist',
+  'Paediatrics', 'Paediatrician & Neonatologist', 'Gynaecologist & Obstetrician',
+  'Urologist', 'Rheumatologist', 'Oncologist', 'Infertility Specialist',
+  'Nutritionist & Dietician'
+];
+
 export default function AdminDashboard() {
   const navigate = useNavigate();
   const { user, token, loading: authLoading } = useAuth();
@@ -69,16 +78,42 @@ export default function AdminDashboard() {
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [changingPassword, setChangingPassword] = useState(false);
 
+  // Doctor management state
+  const [doctors, setDoctors] = useState([]);
+  const [isDoctorDialogOpen, setIsDoctorDialogOpen] = useState(false);
+  const [editingDoctor, setEditingDoctor] = useState(null);
+  const [doctorForm, setDoctorForm] = useState({
+    name: '',
+    specialization: '',
+    qualifications: '',
+    max_daily_appointments: '',
+    categories: ''
+  });
+
+  // Staff management state
+  const [staff, setStaff] = useState([]);
+  const [isStaffDialogOpen, setIsStaffDialogOpen] = useState(false);
+  const [staffForm, setStaffForm] = useState({
+    username: '',
+    email: '',
+    password: '',
+    role: 'admin'
+  });
+
   useEffect(() => {
     if (!authLoading) {
       if (!user) {
         navigate('/login');
-      } else if (user.role !== 'admin' && user.role !== 'doctor') {
+      } else if (user.role !== 'admin' && user.role !== 'doctor' && user.role !== 'receptionist') {
         navigate('/patient/dashboard');
       } else {
         fetchAppointments();
         fetchAvailability();
         fetchBlockedSlots();
+        fetchDoctors();
+        if (user.role === 'admin') {
+          fetchStaff();
+        }
       }
     }
   }, [user, authLoading]);
@@ -120,6 +155,131 @@ export default function AdminDashboard() {
       setBlockedSlots(response.data);
     } catch (error) {
       console.error('Failed to load blocked slots:', error);
+    }
+  };
+
+  const fetchDoctors = async () => {
+    try {
+      const response = await axios.get(`${API}/doctors`);
+      setDoctors(response.data);
+    } catch (error) {
+      console.error('Failed to load doctors:', error);
+    }
+  };
+
+  const fetchStaff = async () => {
+    try {
+      const response = await axios.get(`${API}/staff`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setStaff(response.data);
+    } catch (error) {
+      console.error('Failed to load staff:', error);
+    }
+  };
+
+  // Doctor management functions
+  const openDoctorDialog = (doctor = null) => {
+    if (doctor) {
+      setEditingDoctor(doctor);
+      setDoctorForm({
+        name: doctor.name,
+        specialization: doctor.specialization,
+        qualifications: doctor.qualifications,
+        max_daily_appointments: doctor.max_daily_appointments || '',
+        categories: doctor.categories?.join(', ') || ''
+      });
+    } else {
+      setEditingDoctor(null);
+      setDoctorForm({
+        name: '',
+        specialization: '',
+        qualifications: '',
+        max_daily_appointments: '',
+        categories: ''
+      });
+    }
+    setIsDoctorDialogOpen(true);
+  };
+
+  const handleSaveDoctor = async () => {
+    if (!doctorForm.name || !doctorForm.specialization || !doctorForm.qualifications) {
+      toast.error('Please fill in all required fields');
+      return;
+    }
+
+    const doctorData = {
+      name: doctorForm.name,
+      specialization: doctorForm.specialization,
+      qualifications: doctorForm.qualifications,
+      max_daily_appointments: doctorForm.max_daily_appointments ? parseInt(doctorForm.max_daily_appointments) : null,
+      categories: doctorForm.categories ? doctorForm.categories.split(',').map(c => c.trim()) : null
+    };
+
+    try {
+      if (editingDoctor) {
+        await axios.put(`${API}/doctors/${editingDoctor.id}`, doctorData, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        toast.success('Doctor updated successfully');
+      } else {
+        await axios.post(`${API}/doctors`, doctorData, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        toast.success('Doctor added successfully');
+      }
+      setIsDoctorDialogOpen(false);
+      fetchDoctors();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Failed to save doctor');
+    }
+  };
+
+  const handleDeleteDoctor = async (doctorId) => {
+    if (!window.confirm('Are you sure you want to delete this doctor?')) return;
+
+    try {
+      await axios.delete(`${API}/doctors/${doctorId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      toast.success('Doctor deleted successfully');
+      fetchDoctors();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Failed to delete doctor');
+    }
+  };
+
+  // Staff management functions
+  const handleCreateStaff = async () => {
+    if (!staffForm.username || !staffForm.email || !staffForm.password) {
+      toast.error('Please fill in all fields');
+      return;
+    }
+
+    try {
+      await axios.post(`${API}/staff`, staffForm, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      toast.success('Staff account created successfully');
+      setIsStaffDialogOpen(false);
+      setStaffForm({ username: '', email: '', password: '', role: 'admin' });
+      fetchStaff();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Failed to create staff account');
+    }
+  };
+
+  const handleDeleteStaff = async (staffId) => {
+    if (!window.confirm('Are you sure you want to delete this staff account?')) return;
+
+    try {
+      await axios.delete(`${API}/staff/${staffId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      toast.success('Staff account deleted successfully');
+      fetchStaff();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Failed to delete staff account');
     }
   };
 
@@ -286,17 +446,29 @@ export default function AdminDashboard() {
             </div>
           </div>
 
-          {/* Tabs for Appointments and Time Slot Management */}
+          {/* Tabs for Appointments, Time Slots, Doctors, and Staff Management */}
           <Tabs defaultValue="appointments" className="w-full">
-            <TabsList className="mb-6">
-              <TabsTrigger value="appointments" className="px-6">
+            <TabsList className="mb-6 flex flex-wrap gap-2">
+              <TabsTrigger value="appointments" className="px-4">
                 <FileText className="h-4 w-4 mr-2" />
                 Appointments
               </TabsTrigger>
-              <TabsTrigger value="timeslots" className="px-6">
+              <TabsTrigger value="timeslots" className="px-4">
                 <Clock className="h-4 w-4 mr-2" />
                 Time Slots
               </TabsTrigger>
+              {user?.role === 'admin' && (
+                <>
+                  <TabsTrigger value="doctors" className="px-4">
+                    <Stethoscope className="h-4 w-4 mr-2" />
+                    Doctors
+                  </TabsTrigger>
+                  <TabsTrigger value="staff" className="px-4">
+                    <Users className="h-4 w-4 mr-2" />
+                    Staff
+                  </TabsTrigger>
+                </>
+              )}
             </TabsList>
 
             {/* Appointments Tab */}
@@ -467,9 +639,257 @@ export default function AdminDashboard() {
                 )}
               </div>
             </TabsContent>
+
+            {/* Doctors Management Tab */}
+            {user?.role === 'admin' && (
+              <TabsContent value="doctors">
+                <div className="bg-white rounded-3xl p-6 border border-border/40">
+                  <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-xl font-semibold">Manage Doctors</h2>
+                    <Button onClick={() => openDoctorDialog()} className="rounded-full bg-black hover:bg-gray-800">
+                      <Plus className="h-4 w-4 mr-2" />
+                      Add Doctor
+                    </Button>
+                  </div>
+
+                  <div className="space-y-3">
+                    {doctors.map((doctor) => (
+                      <div 
+                        key={doctor.id}
+                        className="flex items-center justify-between p-4 border border-border rounded-xl hover:bg-gray-50"
+                      >
+                        <div className="flex-1 min-w-0">
+                          <p className="font-semibold">{doctor.name}</p>
+                          <p className="text-sm text-primary">{doctor.specialization}</p>
+                          <p className="text-xs text-muted-foreground truncate">{doctor.qualifications}</p>
+                        </div>
+                        <div className="flex items-center gap-2 ml-4">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => openDoctorDialog(doctor)}
+                            className="rounded-full"
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleDeleteDoctor(doctor.id)}
+                            className="rounded-full text-red-600 hover:text-red-700 hover:bg-red-50"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </TabsContent>
+            )}
+
+            {/* Staff Management Tab */}
+            {user?.role === 'admin' && (
+              <TabsContent value="staff">
+                <div className="bg-white rounded-3xl p-6 border border-border/40">
+                  <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-xl font-semibold">Manage Staff</h2>
+                    <Button onClick={() => setIsStaffDialogOpen(true)} className="rounded-full bg-black hover:bg-gray-800">
+                      <UserPlus className="h-4 w-4 mr-2" />
+                      Add Staff
+                    </Button>
+                  </div>
+
+                  <div className="space-y-3">
+                    {staff.map((member) => (
+                      <div 
+                        key={member.id}
+                        className="flex items-center justify-between p-4 border border-border rounded-xl hover:bg-gray-50"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="bg-primary/10 p-2 rounded-full">
+                            <User className="h-5 w-5 text-primary" />
+                          </div>
+                          <div>
+                            <p className="font-semibold">{member.username}</p>
+                            <p className="text-sm text-muted-foreground">{member.email}</p>
+                            <span className={`text-xs px-2 py-0.5 rounded-full ${member.role === 'admin' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'}`}>
+                              {member.role}
+                            </span>
+                          </div>
+                        </div>
+                        {member.id !== user?.id && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleDeleteStaff(member.id)}
+                            className="rounded-full text-red-600 hover:text-red-700 hover:bg-red-50"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </TabsContent>
+            )}
           </Tabs>
         </div>
       </div>
+
+      {/* Doctor Dialog */}
+      <Dialog open={isDoctorDialogOpen} onOpenChange={setIsDoctorDialogOpen}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>{editingDoctor ? 'Edit Doctor' : 'Add New Doctor'}</DialogTitle>
+            <DialogDescription>
+              {editingDoctor ? 'Update doctor information' : 'Add a new doctor to the system'}
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            <div>
+              <Label>Name *</Label>
+              <Input
+                value={doctorForm.name}
+                onChange={(e) => setDoctorForm({...doctorForm, name: e.target.value})}
+                className="rounded-lg mt-1"
+                placeholder="Dr. Full Name"
+              />
+            </div>
+            
+            <div>
+              <Label>Specialization *</Label>
+              <Select
+                value={doctorForm.specialization}
+                onValueChange={(value) => setDoctorForm({...doctorForm, specialization: value})}
+              >
+                <SelectTrigger className="rounded-lg mt-1">
+                  <SelectValue placeholder="Select specialization" />
+                </SelectTrigger>
+                <SelectContent>
+                  {SPECIALIZATIONS.map((spec) => (
+                    <SelectItem key={spec} value={spec}>{spec}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div>
+              <Label>Qualifications *</Label>
+              <Textarea
+                value={doctorForm.qualifications}
+                onChange={(e) => setDoctorForm({...doctorForm, qualifications: e.target.value})}
+                className="rounded-lg mt-1"
+                placeholder="MBBS, MD, etc."
+                rows={2}
+              />
+            </div>
+            
+            <div>
+              <Label>Daily Appointment Limit (optional)</Label>
+              <Input
+                type="number"
+                value={doctorForm.max_daily_appointments}
+                onChange={(e) => setDoctorForm({...doctorForm, max_daily_appointments: e.target.value})}
+                className="rounded-lg mt-1"
+                placeholder="Leave empty for unlimited"
+              />
+            </div>
+            
+            <div>
+              <Label>Categories (comma separated)</Label>
+              <Input
+                value={doctorForm.categories}
+                onChange={(e) => setDoctorForm({...doctorForm, categories: e.target.value})}
+                className="rounded-lg mt-1"
+                placeholder="e.g., Physician, Chest Specialist"
+              />
+            </div>
+          </div>
+          
+          <div className="flex justify-end gap-3">
+            <Button variant="outline" onClick={() => setIsDoctorDialogOpen(false)} className="rounded-full">
+              Cancel
+            </Button>
+            <Button onClick={handleSaveDoctor} className="rounded-full bg-black hover:bg-gray-800">
+              {editingDoctor ? 'Update' : 'Add'} Doctor
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Staff Dialog */}
+      <Dialog open={isStaffDialogOpen} onOpenChange={setIsStaffDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Add New Staff</DialogTitle>
+            <DialogDescription>
+              Create a new staff account for receptionist or admin
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            <div>
+              <Label>Username *</Label>
+              <Input
+                value={staffForm.username}
+                onChange={(e) => setStaffForm({...staffForm, username: e.target.value})}
+                className="rounded-lg mt-1"
+                placeholder="Full name"
+              />
+            </div>
+            
+            <div>
+              <Label>Email *</Label>
+              <Input
+                type="email"
+                value={staffForm.email}
+                onChange={(e) => setStaffForm({...staffForm, email: e.target.value})}
+                className="rounded-lg mt-1"
+                placeholder="email@example.com"
+              />
+            </div>
+            
+            <div>
+              <Label>Password *</Label>
+              <Input
+                type="password"
+                value={staffForm.password}
+                onChange={(e) => setStaffForm({...staffForm, password: e.target.value})}
+                className="rounded-lg mt-1"
+                placeholder="Minimum 6 characters"
+              />
+            </div>
+            
+            <div>
+              <Label>Role</Label>
+              <Select
+                value={staffForm.role}
+                onValueChange={(value) => setStaffForm({...staffForm, role: value})}
+              >
+                <SelectTrigger className="rounded-lg mt-1">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="admin">Admin</SelectItem>
+                  <SelectItem value="receptionist">Receptionist</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          
+          <div className="flex justify-end gap-3">
+            <Button variant="outline" onClick={() => setIsStaffDialogOpen(false)} className="rounded-full">
+              Cancel
+            </Button>
+            <Button onClick={handleCreateStaff} className="rounded-full bg-black hover:bg-gray-800">
+              Create Account
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Block Slot Dialog */}
       <Dialog open={isBlockDialogOpen} onOpenChange={setIsBlockDialogOpen}>

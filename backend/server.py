@@ -34,6 +34,7 @@ class UserRole(str, Enum):
     PATIENT = "patient"
     ADMIN = "admin"
     DOCTOR = "doctor"
+    RECEPTIONIST = "receptionist"
 
 class AppointmentStatus(str, Enum):
     PENDING = "pending"
@@ -98,6 +99,30 @@ class BlockedSlotCreate(BaseModel):
     date: str
     time_slot: str
     reason: Optional[str] = None
+
+class DoctorCreate(BaseModel):
+    name: str
+    specialization: str
+    qualifications: str
+    available_days: List[str] = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+    accepts_online_booking: bool = True
+    max_daily_appointments: Optional[int] = None
+    categories: Optional[List[str]] = None
+
+class DoctorUpdate(BaseModel):
+    name: Optional[str] = None
+    specialization: Optional[str] = None
+    qualifications: Optional[str] = None
+    available_days: Optional[List[str]] = None
+    accepts_online_booking: Optional[bool] = None
+    max_daily_appointments: Optional[int] = None
+    categories: Optional[List[str]] = None
+
+class StaffCreate(BaseModel):
+    username: str
+    email: EmailStr
+    password: str
+    role: str = "admin"  # admin or receptionist
 
 class Appointment(BaseModel):
     model_config = ConfigDict(extra="ignore")
@@ -626,6 +651,139 @@ async def get_doctor_availability(doctor_id: str, date: str):
         "max_daily_appointments": max_daily,
         "message": f"Fully booked for {date}" if not is_available else f"{max_daily - existing_count} slots remaining"
     }
+
+
+# ==================== DOCTOR MANAGEMENT ====================
+
+@api_router.post("/doctors")
+async def create_doctor(doctor_data: DoctorCreate, current_user: dict = Depends(get_current_user)):
+    """Create a new doctor (admin only)"""
+    if current_user['role'] != 'admin':
+        raise HTTPException(status_code=403, detail="Only admins can add doctors")
+    
+    doctor = Doctor(
+        name=doctor_data.name,
+        specialization=doctor_data.specialization,
+        qualifications=doctor_data.qualifications,
+        available_days=doctor_data.available_days,
+        accepts_online_booking=doctor_data.accepts_online_booking,
+        max_daily_appointments=doctor_data.max_daily_appointments,
+        categories=doctor_data.categories
+    )
+    
+    doc = doctor.model_dump()
+    doc['created_at'] = doc['created_at'].isoformat()
+    
+    await db.doctors.insert_one(doc)
+    doc.pop('_id', None)
+    
+    return {"message": "Doctor added successfully", "doctor": doc}
+
+
+@api_router.put("/doctors/{doctor_id}")
+async def update_doctor(doctor_id: str, doctor_data: DoctorUpdate, current_user: dict = Depends(get_current_user)):
+    """Update a doctor's information (admin only)"""
+    if current_user['role'] != 'admin':
+        raise HTTPException(status_code=403, detail="Only admins can update doctors")
+    
+    # Build update dict with only provided fields
+    update_data = {k: v for k, v in doctor_data.model_dump().items() if v is not None}
+    
+    if not update_data:
+        raise HTTPException(status_code=400, detail="No update data provided")
+    
+    result = await db.doctors.update_one(
+        {"id": doctor_id},
+        {"$set": update_data}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Doctor not found")
+    
+    # Get updated doctor
+    updated_doctor = await db.doctors.find_one({"id": doctor_id}, {"_id": 0})
+    
+    return {"message": "Doctor updated successfully", "doctor": updated_doctor}
+
+
+@api_router.delete("/doctors/{doctor_id}")
+async def delete_doctor(doctor_id: str, current_user: dict = Depends(get_current_user)):
+    """Delete a doctor (admin only)"""
+    if current_user['role'] != 'admin':
+        raise HTTPException(status_code=403, detail="Only admins can delete doctors")
+    
+    result = await db.doctors.delete_one({"id": doctor_id})
+    
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Doctor not found")
+    
+    return {"message": "Doctor deleted successfully"}
+
+
+# ==================== STAFF MANAGEMENT ====================
+
+@api_router.get("/staff")
+async def get_all_staff(current_user: dict = Depends(get_current_user)):
+    """Get all staff members (admin only)"""
+    if current_user['role'] != 'admin':
+        raise HTTPException(status_code=403, detail="Only admins can view staff list")
+    
+    staff = await db.users.find(
+        {"role": {"$in": ["admin", "receptionist"]}},
+        {"_id": 0, "hashed_password": 0, "password": 0}
+    ).to_list(100)
+    
+    return staff
+
+
+@api_router.post("/staff")
+async def create_staff(staff_data: StaffCreate, current_user: dict = Depends(get_current_user)):
+    """Create a new staff member (admin only)"""
+    if current_user['role'] != 'admin':
+        raise HTTPException(status_code=403, detail="Only admins can create staff accounts")
+    
+    # Check if email already exists
+    existing = await db.users.find_one({"email": staff_data.email})
+    if existing:
+        raise HTTPException(status_code=400, detail="Email already registered")
+    
+    # Hash password
+    hashed_password = bcrypt.hashpw(staff_data.password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+    
+    user = User(
+        username=staff_data.username,
+        email=staff_data.email,
+        hashed_password=hashed_password,
+        role=UserRole(staff_data.role) if staff_data.role in ['admin', 'receptionist'] else UserRole.ADMIN
+    )
+    
+    doc = user.model_dump()
+    doc['created_at'] = doc['created_at'].isoformat()
+    doc['role'] = doc['role'].value
+    
+    await db.users.insert_one(doc)
+    doc.pop('_id', None)
+    doc.pop('hashed_password', None)
+    
+    return {"message": "Staff account created successfully", "staff": doc}
+
+
+@api_router.delete("/staff/{user_id}")
+async def delete_staff(user_id: str, current_user: dict = Depends(get_current_user)):
+    """Delete a staff member (admin only)"""
+    if current_user['role'] != 'admin':
+        raise HTTPException(status_code=403, detail="Only admins can delete staff accounts")
+    
+    # Prevent self-deletion
+    if user_id == current_user['user_id']:
+        raise HTTPException(status_code=400, detail="Cannot delete your own account")
+    
+    result = await db.users.delete_one({"id": user_id, "role": {"$in": ["admin", "receptionist"]}})
+    
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Staff member not found")
+    
+    return {"message": "Staff account deleted successfully"}
 
 
 @api_router.get("/")
