@@ -20,8 +20,16 @@ ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
 mongo_url = os.environ['MONGO_URL']
-client = AsyncIOMotorClient(mongo_url)
-db = client[os.environ['DB_NAME']]
+db_name = os.environ.get('DB_NAME', 'copolyz_db')
+
+# Configure MongoDB client with proper settings for Atlas
+client = AsyncIOMotorClient(
+    mongo_url,
+    serverSelectionTimeoutMS=5000,
+    connectTimeoutMS=10000,
+    socketTimeoutMS=10000
+)
+db = client[db_name]
 
 app = FastAPI()
 api_router = APIRouter(prefix="/api")
@@ -279,6 +287,25 @@ async def change_password(request: ChangePasswordRequest, current_user: dict = D
     )
     
     return {"message": "Password changed successfully"}
+
+
+@api_router.get("/health")
+async def health_check():
+    try:
+        # Try to ping the database
+        await client.admin.command('ping')
+        doctor_count = await db.doctors.count_documents({})
+        return {
+            "status": "healthy",
+            "database": "connected",
+            "doctor_count": doctor_count
+        }
+    except Exception as e:
+        return {
+            "status": "unhealthy",
+            "database": "disconnected",
+            "error": str(e)
+        }
 
 
 @api_router.get("/doctors", response_model=List[Doctor])
