@@ -827,6 +827,63 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
+# One-time seed endpoint for production database
+@api_router.post("/seed-doctors")
+async def seed_doctors(doctors: List[DoctorCreate], secret: str = ""):
+    """One-time endpoint to seed doctors in production"""
+    if secret != "copolyz-seed-2026":
+        raise HTTPException(status_code=403, detail="Invalid secret")
+    
+    added = 0
+    for doc_data in doctors:
+        existing = await db.doctors.find_one({"name": doc_data.name})
+        if not existing:
+            doctor = Doctor(
+                name=doc_data.name,
+                specialization=doc_data.specialization,
+                qualifications=doc_data.qualifications,
+                image_url=doc_data.image_url,
+                available_days=doc_data.available_days,
+                accepts_online_booking=doc_data.accepts_online_booking,
+                max_daily_appointments=doc_data.max_daily_appointments,
+                categories=doc_data.categories
+            )
+            await db.doctors.insert_one(doctor.model_dump())
+            added += 1
+    
+    return {"message": f"Added {added} doctors", "total": len(doctors)}
+
+# Also create admin user if not exists
+@api_router.post("/setup-admin")
+async def setup_admin(secret: str = ""):
+    """One-time endpoint to setup admin user"""
+    if secret != "copolyz-seed-2026":
+        raise HTTPException(status_code=403, detail="Invalid secret")
+    
+    admin_email = "admin@coochbehar.com"
+    existing = await db.users.find_one({"email": admin_email})
+    
+    if existing:
+        # Update to admin role
+        await db.users.update_one(
+            {"email": admin_email},
+            {"$set": {"role": "admin"}}
+        )
+        return {"message": "Admin role updated"}
+    else:
+        # Create new admin
+        admin = User(
+            email=admin_email,
+            name="Admin",
+            phone="1234567890",
+            password=hash_password("admin123"),
+            role=UserRole.ADMIN
+        )
+        await db.users.insert_one(admin.model_dump())
+        return {"message": "Admin created"}
+
+
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
