@@ -83,6 +83,8 @@ export default function DoctorDetailPage() {
     }
   };
 
+  const [bookingSuccess, setBookingSuccess] = useState(false);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -94,14 +96,16 @@ export default function DoctorDetailPage() {
       };
       
       await axios.post(`${API}/appointments`, appointmentData);
-      toast.success('Appointment request submitted successfully!');
+      toast.success('Appointment booked successfully! We will contact you shortly.');
+      setBookingSuccess(true);
       
-      if (!user) {
-        toast.info('Create an account to track your appointments');
-        setTimeout(() => navigate('/signup'), 2000);
-      } else {
-        setTimeout(() => navigate('/patient/dashboard'), 2000);
-      }
+      // Reset form
+      setFormData({
+        patient_name: '',
+        patient_phone: '',
+        preferred_date: '',
+        preferred_time: ''
+      });
     } catch (error) {
       toast.error(error.response?.data?.detail || 'Failed to book appointment');
       console.error(error);
@@ -225,25 +229,53 @@ export default function DoctorDetailPage() {
 
           {/* Appointment Form */}
           <div className="bg-white rounded-xl p-4 border border-border/40">
-            <h2 className="text-base font-semibold mb-2" data-testid="appointment-form-title">
-              Request Appointment
-            </h2>
-            <p className="text-xs text-muted-foreground mb-4">
-              অ্যাপয়েন্টমেন্টের জন্য ফর্মটি পূরণ করুন
-            </p>
-            
-            <form onSubmit={handleSubmit} className="space-y-3">
-              <div>
-                <Label htmlFor="patient_name" className="text-sm">Full Name / পুরো নাম *</Label>
-                <Input
-                  id="patient_name"
-                  value={formData.patient_name}
-                  onChange={(e) => setFormData({...formData, patient_name: e.target.value})}
-                  required
-                  className="rounded-lg mt-1 h-9 text-sm"
-                  placeholder="আপনার পুরো নাম"
-                  data-testid="input-name"
-                />
+            {bookingSuccess ? (
+              <div className="text-center py-6">
+                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-semibold text-green-700 mb-2">Appointment Booked!</h3>
+                <p className="text-sm text-gray-600 mb-1">অ্যাপয়েন্টমেন্ট সফলভাবে বুক হয়েছে!</p>
+                <p className="text-xs text-gray-500 mb-4">We will contact you shortly to confirm.</p>
+                <div className="flex gap-2 justify-center">
+                  <Button 
+                    variant="outline" 
+                    onClick={() => setBookingSuccess(false)}
+                    className="text-sm"
+                  >
+                    Book Another
+                  </Button>
+                  <Button 
+                    onClick={() => navigate('/')}
+                    className="text-sm bg-primary"
+                  >
+                    Go Home
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <>
+                <h2 className="text-base font-semibold mb-2" data-testid="appointment-form-title">
+                  Request Appointment
+                </h2>
+                <p className="text-xs text-muted-foreground mb-4">
+                  অ্যাপয়েন্টমেন্টের জন্য ফর্মটি পূরণ করুন
+                </p>
+                
+                <form onSubmit={handleSubmit} className="space-y-3">
+                  <div>
+                    <Label htmlFor="patient_name" className="text-sm">Full Name / পুরো নাম *</Label>
+                    <Input
+                      id="patient_name"
+                      value={formData.patient_name}
+                      onChange={(e) => setFormData({...formData, patient_name: e.target.value})}
+                      required
+                      className="rounded-lg mt-1 h-9 text-sm"
+                      placeholder="আপনার পুরো নাম"
+                      data-testid="input-name"
+                    />
               </div>
               
               <div>
@@ -306,6 +338,8 @@ export default function DoctorDetailPage() {
                 Our staff will confirm your appointment
               </p>
             </form>
+              </>
+            )}
           </div>
         </div>
       </div>
